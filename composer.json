@@ -1,0 +1,21 @@
+{
+  "name": "php/symfony-http-entity-manager",
+  "description": "Doctrine-like http client",
+  "type": "library",
+  "license": "MIT",
+  "minimum-stability": "stable",
+  "require": {
+    "php": "^8.0",
+    "symfony/http-client-contracts": "^2.4",
+    "adbario/php-dot-notation": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Awwar\\PhpHttpEntityManager\\": "src"
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^1.8.0",
+    "squizlabs/php_codesniffer": "^3.7.0"
+  }
+}
