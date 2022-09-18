@@ -1,5 +1,5 @@
 {
-  "name": "php/symfony-http-entity-manager",
+  "name": "awwar/php-http-entity-manager",
   "description": "Doctrine-like http client",
   "type": "library",
   "license": "MIT",
