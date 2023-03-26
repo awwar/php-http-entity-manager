@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\Client;
 
 use Awwar\PhpHttpEntityManager\Exception\InvalidDataException;
 use Awwar\PhpHttpEntityManager\Exception\NotFoundException;

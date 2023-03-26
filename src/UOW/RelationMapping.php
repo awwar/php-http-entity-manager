@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
-use Awwar\PhpHttpEntityManager\Annotation\RelationField;
+use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 
 class RelationMapping
 {
@@ -18,7 +18,7 @@ class RelationMapping
 
         $mapping->class = $data['class'];
         $mapping->name = $data['name'];
-        $mapping->isCollection = $data['expects'] === RelationField::MANY;
+        $mapping->isCollection = $data['expects'] === RelationExpectsEnum::MANY;
         //$mapping->lateUrl = $data['lateUrl'];
 
         return $mapping;

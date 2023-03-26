@@ -7,17 +7,18 @@ use RuntimeException;
 
 class MetadataRegistry implements MetadataRegistryInterface
 {
+    /** @var EntityMetadata[] $metadataMap */
     private array $metadataMap = [];
+
     private array $proxyAliases = [];
 
     /**
+     * @param EntityMetadata[] $metadataMap
      * @throws Exception
      */
     public function __construct(array $metadataMap = [])
     {
-        foreach ($metadataMap as $data) {
-            $metadata = new EntityMetadata($data);
-
+        foreach ($metadataMap as $metadata) {
             $proxyClass = $metadata->getProxyClass();
             $originalClass = $metadata->getClassName();
 

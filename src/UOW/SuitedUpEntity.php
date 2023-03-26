@@ -3,7 +3,6 @@
 namespace Awwar\PhpHttpEntityManager\UOW;
 
 use Adbar\Dot;
-use Awwar\PhpHttpEntityManager\Annotation\EmptyValue;
 use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
 use Closure;

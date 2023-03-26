@@ -14,8 +14,12 @@
       "Awwar\\PhpHttpEntityManager\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": { "Awwar\\PhpHttpEntityManager\\Tests\\": "tests/" }
+  },
   "require-dev": {
     "phpstan/phpstan": "^1.8.0",
-    "squizlabs/php_codesniffer": "^3.7.0"
+    "squizlabs/php_codesniffer": "^3.7.0",
+    "phpunit/phpunit": "^9.6"
   }
 }
