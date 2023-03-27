@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\Metadata;
 
-class UrlMetadata
+class UrlSettings
 {
     public function __construct(
         private string $one,

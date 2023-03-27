@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\Metadata;
 
-class FilterMetadata
+class FilterSettings
 {
     public function __construct(
         private array $filterQuery = [],

@@ -14,7 +14,7 @@ class NotProcessedException extends DomainException
         ?int $code = 500,
         ?Throwable $previous = null
     ) {
-        parent::__construct("Had some error while $entity procession", (int)$code, $previous);
+        parent::__construct("Had some error while $entity procession", (int) $code, $previous);
     }
 
     public function getContext(): array

@@ -6,7 +6,7 @@ use Adbar\Dot;
 use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
-use Awwar\PhpHttpEntityManager\Metadata\RelationMetadata;
+use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use Closure;
 use Exception;
 use Throwable;
@@ -212,12 +212,15 @@ class SuitedUpEntity
             $relation = $this->getRelationValue($this->original, $property, $mapping);
 
             if (is_iterable($relation) && $mapping->isCollection()) {
+                $value = [];
                 foreach ($relation as $subRelation) {
-                    $snapshot[$property][] = $this->getEntityUniqueId($subRelation);
+                    $value[] = $this->getEntityUniqueId($subRelation);
                 }
             } else {
-                $snapshot[$property] = $relation === null ? null : $this->getEntityUniqueId($relation);
+                $value = $relation === null ? null : $this->getEntityUniqueId($relation);
             }
+
+            $snapshot[$property] = $value;
         }
 
         return $snapshot;
@@ -318,6 +321,7 @@ class SuitedUpEntity
         $this->original = $this->entityMetadata->getProxy();
 
         $callback = function ($idProperty, $properties) use ($managerCallback, $id) {
+            //@phpstan-ignore-next-line
             $this->__prepare($idProperty, $properties, $managerCallback, $id === null);
         };
 
@@ -364,7 +368,7 @@ class SuitedUpEntity
     }
 
     private function createNestedRelation(
-        RelationMetadata $mapping,
+        RelationSettings $mapping,
         iterable $relationIterator,
         EntityCreatorInterface $creator
     ): ?object {
@@ -412,7 +416,7 @@ class SuitedUpEntity
 
     private function getEntitySplId(object $entity): string
     {
-        return (string)spl_object_id($entity);
+        return (string) spl_object_id($entity);
     }
 
     private function getEntityUniqueId(object $entity): string
@@ -424,7 +428,7 @@ class SuitedUpEntity
         return sha1($this->getEntityId($entity) . get_class($entity));
     }
 
-    private function getRelationValue(object $object, string $property, RelationMetadata $mapping): mixed
+    private function getRelationValue(object $object, string $property, RelationSettings $mapping): mixed
     {
         $data = $this->getValue($object, $property);
 

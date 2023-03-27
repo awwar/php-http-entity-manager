@@ -7,6 +7,7 @@ use Awwar\PhpHttpEntityManager\Http\HttpRepositoryInterface;
 use Awwar\PhpHttpEntityManager\Proxy\EmptyProxy;
 use ReflectionClass;
 use ReflectionException;
+use RuntimeException;
 
 class EntityMetadata
 {
@@ -14,24 +15,31 @@ class EntityMetadata
 
     private object $proxy;
 
+    private FilterSettings $filterSettings;
+
+    private UrlSettings $urlSettings;
+
+    private CallbacksSettings $callbacksSettings;
+
     /**
      * @throws ReflectionException
      */
     public function __construct(
         string $entityClassName,
-        private FieldsMetadata $fieldsMetadata,
+        private FieldsSettings $fieldsSettings,
         private ClientInterface $client,
-        private ?string $name = null,
+        private string $name = '',
         string $proxyClassName = EmptyProxy::class,
         private bool $useDiffOnUpdate = true,
-        private ?FilterMetadata $filterMetadata = null,
+        ?FilterSettings $filterSettings = null,
         private ?HttpRepositoryInterface $repository = null,
-        private ?UrlMetadata $urlMetadata = null,
-        private ?CallbacksMetadata $callbacksMetadata = null
+        ?UrlSettings $urlSettings = null,
+        ?CallbacksSettings $callbacksSettings = null
     ) {
         if (empty($this->name)) {
             $path = explode('\\', $entityClassName);
-            $this->name = strtolower(preg_replace("/([a-z])([A-Z])/", "$1_$2", array_pop($path)));
+            $snakeCaseName = (string) preg_replace("/([a-z])([A-Z])/", "$1_$2", array_pop($path));
+            $this->name = strtolower($snakeCaseName);
         }
 
         $this->proxy = (new ReflectionClass($proxyClassName))
@@ -40,22 +48,22 @@ class EntityMetadata
         $this->emptyInstance = (new ReflectionClass($entityClassName))
             ->newInstanceWithoutConstructor();
 
-        if ($this->filterMetadata === null) {
-            $this->filterMetadata = new FilterMetadata();
+        if ($filterSettings === null) {
+            $this->filterSettings = new FilterSettings();
         }
 
-        if ($this->urlMetadata === null) {
-            $this->urlMetadata = new UrlMetadata(
-                one:    "/api/$name/{id}",
-                list:   "/api/$name/",
-                create: "/api/$name/",
-                update: "/api/$name/{id}",
-                delete: "/api/$name/{id}"
+        if ($urlSettings === null) {
+            $this->urlSettings = new UrlSettings(
+                one: "/api/$this->name/{id}/",
+                list: "/api/$this->name/",
+                create: "/api/$this->name/",
+                update: "/api/$this->name/{id}/",
+                delete: "/api/$this->name/{id}/"
             );
         }
 
-        if ($this->callbacksMetadata === null) {
-            $this->callbacksMetadata = new CallbacksMetadata();
+        if ($callbacksSettings === null) {
+            $this->callbacksSettings = new CallbacksSettings();
         }
     }
 
@@ -72,14 +80,15 @@ class EntityMetadata
     public function getCreateLayout(): callable
     {
         return $this
-            ->callbacksMetadata
-            ->getCreateLayout()
-            ->bindTo($this->emptyInstance, $this->emptyInstance);
+                ->callbacksSettings
+                ->getCreateLayout()
+                ->bindTo($this->emptyInstance, $this->emptyInstance)
+            ?? throw new RuntimeException('Unable to binding callback');
     }
 
     public function getDefaultValue(string $property): mixed
     {
-        $defaults = $this->fieldsMetadata->getDefaultValues();
+        $defaults = $this->fieldsSettings->getDefaultValues();
 
         if (array_key_exists($property, $defaults) === false) {
             return null;
@@ -100,30 +109,31 @@ class EntityMetadata
 
     public function getFilterOneQuery(): array
     {
-        return $this->filterMetadata->getFilterOneQuery();
+        return $this->filterSettings->getFilterOneQuery();
     }
 
     public function getFilterQuery(): array
     {
-        return $this->filterMetadata->getFilterQuery();
+        return $this->filterSettings->getFilterQuery();
     }
 
     public function getGetOneQuery(): array
     {
-        return $this->filterMetadata->getGetOneQuery();
+        return $this->filterSettings->getGetOneQuery();
     }
 
     public function getIdProperty(): string
     {
-        return $this->fieldsMetadata->getIdProperty();
+        return $this->fieldsSettings->getIdProperty();
     }
 
     public function getListDetermination(): callable
     {
         return $this
-            ->callbacksMetadata
-            ->getListDetermination()
-            ->bindTo($this->emptyInstance, $this->emptyInstance);
+                ->callbacksSettings
+                ->getListDetermination()
+                ->bindTo($this->emptyInstance, $this->emptyInstance)
+            ?? throw new RuntimeException('Unable to binding callback');
     }
 
     public function getName(): string
@@ -133,7 +143,7 @@ class EntityMetadata
 
     public function getProperties(): array
     {
-        return $this->fieldsMetadata->getAllProperties();
+        return $this->fieldsSettings->getAllProperties();
     }
 
     public function getProxy(): object
@@ -149,17 +159,18 @@ class EntityMetadata
     public function getRelationsMapper(): callable
     {
         return $this
-            ->callbacksMetadata
-            ->getRelationMapper()
-            ->bindTo($this->emptyInstance, $this->emptyInstance);
+                ->callbacksSettings
+                ->getRelationMapper()
+                ->bindTo($this->emptyInstance, $this->emptyInstance)
+            ?? throw new RuntimeException('Unable to binding callback');
     }
 
     /**
-     * @return RelationMetadata[]
+     * @return RelationSettings[]
      */
     public function getRelationsMetadata(): array
     {
-        return $this->fieldsMetadata->getRelationProperties();
+        return $this->fieldsSettings->getRelationProperties();
     }
 
     public function getRepository(): ?HttpRepositoryInterface
@@ -169,40 +180,41 @@ class EntityMetadata
 
     public function getScalarProperties(): array
     {
-        return $this->fieldsMetadata->getScalarProperties();
+        return $this->fieldsSettings->getScalarProperties();
     }
 
     public function getUpdateLayout(): callable
     {
         return $this
-            ->callbacksMetadata
-            ->getUpdateLayout()
-            ->bindTo($this->emptyInstance, $this->emptyInstance);
+                ->callbacksSettings
+                ->getUpdateLayout()
+                ->bindTo($this->emptyInstance, $this->emptyInstance)
+            ?? throw new RuntimeException('Unable to binding callback');
     }
 
     public function getUrlForCreate(): string
     {
-        return $this->urlMetadata->getCreate();
+        return $this->urlSettings->getCreate();
     }
 
     public function getUrlForDelete(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->urlMetadata->getDelete());
+        return str_replace('{id}', (string) $id, $this->urlSettings->getDelete());
     }
 
     public function getUrlForList(): string
     {
-        return $this->urlMetadata->getList();
+        return $this->urlSettings->getList();
     }
 
     public function getUrlForOne(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->urlMetadata->getOne());
+        return str_replace('{id}', (string) $id, $this->urlSettings->getOne());
     }
 
     public function getUrlForUpdate(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->urlMetadata->getUpdate());
+        return str_replace('{id}', (string) $id, $this->urlSettings->getUpdate());
     }
 
     public function isUseDiffOnUpdate(): bool

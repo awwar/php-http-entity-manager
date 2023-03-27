@@ -14,7 +14,7 @@ class InvalidDataException extends DomainException
         ?int $code = 422,
         ?Throwable $previous = null
     ) {
-        parent::__construct("Invalid $entity data", (int)$code, $previous);
+        parent::__construct("Invalid $entity data", (int) $code, $previous);
     }
 
     public function getContext(): array

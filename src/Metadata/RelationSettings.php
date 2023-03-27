@@ -4,7 +4,7 @@ namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 
-class RelationMetadata
+class RelationSettings
 {
     private string $class;
 

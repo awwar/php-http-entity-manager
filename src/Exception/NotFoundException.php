@@ -14,7 +14,7 @@ class NotFoundException extends DomainException
         ?int $code = 404,
         ?Throwable $previous = null
     ) {
-        parent::__construct("$entity not found", (int)$code, $previous);
+        parent::__construct("$entity not found", (int) $code, $previous);
     }
 
     public function getContext(): array

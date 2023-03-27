@@ -53,10 +53,10 @@ class Client implements ClientInterface
                 return $this->client->request($method, $path, $context)->toArray();
             }
         } catch (
-        TransportExceptionInterface
-        |RedirectionExceptionInterface
-        |DecodingExceptionInterface
-        |ServerExceptionInterface $e
+            TransportExceptionInterface
+            | RedirectionExceptionInterface
+            | DecodingExceptionInterface
+            | ServerExceptionInterface $e
         ) {
             throw new NotProcessedException(entity: $this->entityName, previous: $e);
         } catch (ClientExceptionInterface $e) {

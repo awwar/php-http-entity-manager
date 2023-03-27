@@ -4,7 +4,7 @@ namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Closure;
 
-class CallbacksMetadata
+class CallbacksSettings
 {
     private Closure $createLayout;
 

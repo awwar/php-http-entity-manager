@@ -4,7 +4,7 @@ namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use InvalidArgumentException;
 
-class FieldsMetadata
+class FieldsSettings
 {
     const AVAILABLE_CONDITIONS = [
         'afterRead',
@@ -62,7 +62,7 @@ class FieldsMetadata
         $this->defaultValues[$fieldName] = $value;
     }
 
-    public function addRelationField(string $fieldName, RelationMetadata $setting): void
+    public function addRelationField(string $fieldName, RelationSettings $setting): void
     {
         if (isset($this->scalarProperties[$fieldName])) {
             throw new InvalidArgumentException(

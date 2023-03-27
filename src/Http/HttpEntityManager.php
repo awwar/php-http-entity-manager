@@ -40,7 +40,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         if ($data instanceof FullData) {
             $suit->setIdAfterRead($data->getData());
         } elseif ($data instanceof Reference) {
-            $suit->proxy(fn($obj) => $this->refresh($obj), $data->getId());
+            $suit->proxy(fn ($obj) => $this->refresh($obj), $data->getId());
         } elseif ($data instanceof NoData) {
             return null;
         } else {

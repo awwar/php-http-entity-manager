@@ -22,7 +22,7 @@ trait ProxyTrait
     {
     }
 
-    public function __get(string $name)
+    public function __get(string $name): mixed
     {
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
             $this->__initialized = true;
@@ -32,7 +32,7 @@ trait ProxyTrait
         return $this->__getter->call($this, $this, $name);
     }
 
-    public function __set(string $name, $value): void
+    public function __set(string $name, mixed $value): void
     {
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
             $this->__initialized = true;
