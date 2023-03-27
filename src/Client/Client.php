@@ -2,10 +2,10 @@
 
 namespace Awwar\PhpHttpEntityManager\Client;
 
+use Awwar\PhpHttpEntityManager\Enum\RequestEnum;
 use Awwar\PhpHttpEntityManager\Exception\InvalidDataException;
 use Awwar\PhpHttpEntityManager\Exception\NotFoundException;
 use Awwar\PhpHttpEntityManager\Exception\NotProcessedException;
-use Awwar\PhpHttpEntityManager\Enum\RequestEnum;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -22,19 +22,9 @@ class Client implements ClientInterface
     ) {
     }
 
-    public function get(string $path, array $query = []): array
-    {
-        return $this->makeRequest(RequestEnum::METHOD_GET, $path, ['query' => $query]);
-    }
-
     public function create(string $path, array $data = []): array
     {
         return $this->makeRequest(RequestEnum::METHOD_POST, $path, ['json' => $data]);
-    }
-
-    public function update(string $path, array $data = []): array
-    {
-        return $this->makeRequest($this->updateMethod, $path, ['json' => $data]);
     }
 
     public function delete(string $path): void
@@ -42,20 +32,31 @@ class Client implements ClientInterface
         $this->makeRequest(RequestEnum::METHOD_DELETE, $path);
     }
 
+    public function get(string $path, array $query = []): array
+    {
+        return $this->makeRequest(RequestEnum::METHOD_GET, $path, ['query' => $query]);
+    }
+
+    public function update(string $path, array $data = []): array
+    {
+        return $this->makeRequest($this->updateMethod, $path, ['json' => $data]);
+    }
+
     private function makeRequest(string $method, string $path, array $context = []): array
     {
         try {
             if ($method === RequestEnum::METHOD_DELETE) {
                 $this->client->request($method, $path, $context)->getContent();
+
                 return [];
             } else {
                 return $this->client->request($method, $path, $context)->toArray();
             }
         } catch (
-            TransportExceptionInterface
-            | RedirectionExceptionInterface
-            | DecodingExceptionInterface
-            | ServerExceptionInterface $e
+        TransportExceptionInterface
+        |RedirectionExceptionInterface
+        |DecodingExceptionInterface
+        |ServerExceptionInterface $e
         ) {
             throw new NotProcessedException(entity: $this->entityName, previous: $e);
         } catch (ClientExceptionInterface $e) {

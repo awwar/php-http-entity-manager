@@ -18,6 +18,10 @@ trait ProxyTrait
 
     private Closure $__setter;
 
+    public function __clone()
+    {
+    }
+
     public function __get(string $name)
     {
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
@@ -36,10 +40,6 @@ trait ProxyTrait
         }
 
         $this->__setter->call($this, $this, $name, $value);
-    }
-
-    public function __clone()
-    {
     }
 
     private function __prepare(string $idProperty, array $properties, Closure $manager, bool $lateProxy = false): void

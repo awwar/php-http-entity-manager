@@ -2,10 +2,10 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
-use Awwar\PhpHttpEntityManager\Exception\IdentityNotFoundException;
 use Awwar\PhpHttpEntityManager\EntityManipulations\Create;
 use Awwar\PhpHttpEntityManager\EntityManipulations\Delete;
 use Awwar\PhpHttpEntityManager\EntityManipulations\Update;
+use Awwar\PhpHttpEntityManager\Exception\IdentityNotFoundException;
 use Exception;
 
 class HttpUnitOfWork implements HttpUnitOfWorkInterface
@@ -16,6 +16,20 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
     private array $identityMap = [];
 
     private array $keyToSplIdMap = [];
+
+    public function clear(string $objectName = null): void
+    {
+        if ($objectName === null) {
+            $this->identityMap = [];
+            $this->keyToSplIdMap = [];
+        } else {
+            foreach ($this->identityMap as $suit) {
+                if ($suit->getClass() === $objectName) {
+                    $this->remove($suit);
+                }
+            }
+        }
+    }
 
     public function commit(SuitedUpEntity $suit, bool $withWatch = true): void
     {
@@ -36,31 +50,6 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
     }
 
-    /**
-     * @throws IdentityNotFoundException
-     * @throws Exception
-     */
-    public function upgrade(SuitedUpEntity $suit): void
-    {
-        if ($suit->isNew()) {
-            throw new Exception("Unable to upgrade new entity");
-        }
-
-        if (false === isset($this->identityMap[$suit->getSPLId()])) {
-            throw IdentityNotFoundException::create($suit->getClass(), $suit->getId());
-        }
-
-        if ($suit->isDeleted()) {
-            $this->remove($suit);
-            unset($this->identityMap[$suit->getSPLId()]);
-            unset($this->keyToSplIdMap[$suit->getUniqueId()]);
-        } else {
-            $suit->startWatch();
-            $this->identityMap[$suit->getSPLId()] = $suit;
-            $this->keyToSplIdMap[$suit->getUniqueId()] = $suit->getSPLId();
-        }
-    }
-
     public function delete(SuitedUpEntity $suit): void
     {
         if (false === $this->hasSuit($suit)) {
@@ -72,35 +61,6 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         $newSuit = $this->getFromIdentity($suit);
 
         $newSuit->delete();
-    }
-
-    public function remove(SuitedUpEntity $suit): void
-    {
-        if (false === $this->hasSuit($suit)) {
-            return;
-        }
-
-        $newSuit = $this->getFromIdentity($suit);
-
-        if (false === $newSuit->isNew()) {
-            unset($this->keyToSplIdMap[$newSuit->getUniqueId()]);
-        }
-
-        unset($this->identityMap[$newSuit->getSPLId()]);
-    }
-
-    public function clear(string $objectName = null): void
-    {
-        if ($objectName === null) {
-            $this->identityMap = [];
-            $this->keyToSplIdMap = [];
-        } else {
-            foreach ($this->identityMap as $suit) {
-                if ($suit->getClass() === $objectName) {
-                    $this->remove($suit);
-                }
-            }
-        }
     }
 
     /**
@@ -174,5 +134,45 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         return $suit->isNew()
             ? isset($this->identityMap[$suit->getSPLId()])
             : isset($this->keyToSplIdMap[$suit->getUniqueId()]);
+    }
+
+    public function remove(SuitedUpEntity $suit): void
+    {
+        if (false === $this->hasSuit($suit)) {
+            return;
+        }
+
+        $newSuit = $this->getFromIdentity($suit);
+
+        if (false === $newSuit->isNew()) {
+            unset($this->keyToSplIdMap[$newSuit->getUniqueId()]);
+        }
+
+        unset($this->identityMap[$newSuit->getSPLId()]);
+    }
+
+    /**
+     * @throws IdentityNotFoundException
+     * @throws Exception
+     */
+    public function upgrade(SuitedUpEntity $suit): void
+    {
+        if ($suit->isNew()) {
+            throw new Exception("Unable to upgrade new entity");
+        }
+
+        if (false === isset($this->identityMap[$suit->getSPLId()])) {
+            throw IdentityNotFoundException::create($suit->getClass(), $suit->getId());
+        }
+
+        if ($suit->isDeleted()) {
+            $this->remove($suit);
+            unset($this->identityMap[$suit->getSPLId()]);
+            unset($this->keyToSplIdMap[$suit->getUniqueId()]);
+        } else {
+            $suit->startWatch();
+            $this->identityMap[$suit->getSPLId()] = $suit;
+            $this->keyToSplIdMap[$suit->getUniqueId()] = $suit->getSPLId();
+        }
     }
 }

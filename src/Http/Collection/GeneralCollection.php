@@ -10,6 +10,11 @@ class GeneralCollection implements Collection
     {
     }
 
+    public function count(): int
+    {
+        return count($this->collection);
+    }
+
     public function getIterator(): Traversable
     {
         foreach ($this->collection as $item) {
@@ -35,10 +40,5 @@ class GeneralCollection implements Collection
     public function offsetUnset($offset): void
     {
         unset($this->collection[$offset]);
-    }
-
-    public function count(): int
-    {
-        return count($this->collection);
     }
 }

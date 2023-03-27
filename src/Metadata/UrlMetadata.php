@@ -13,9 +13,14 @@ class UrlMetadata
     ) {
     }
 
-    public function getOne(): string
+    public function getCreate(): string
     {
-        return $this->one;
+        return $this->create;
+    }
+
+    public function getDelete(): string
+    {
+        return $this->delete;
     }
 
     public function getList(): string
@@ -23,18 +28,13 @@ class UrlMetadata
         return $this->list;
     }
 
-    public function getCreate(): string
+    public function getOne(): string
     {
-        return $this->create;
+        return $this->one;
     }
 
     public function getUpdate(): string
     {
         return $this->update;
-    }
-
-    public function getDelete(): string
-    {
-        return $this->delete;
     }
 }

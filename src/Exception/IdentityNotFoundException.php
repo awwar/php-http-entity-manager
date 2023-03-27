@@ -2,7 +2,9 @@
 
 namespace Awwar\PhpHttpEntityManager\Exception;
 
-class IdentityNotFoundException extends \Exception
+use Exception;
+
+class IdentityNotFoundException extends Exception
 {
     public static function create(string $className, ?string $id): self
     {

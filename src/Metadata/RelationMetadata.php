@@ -1,10 +1,10 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 
-class RelationMapping
+class RelationMetadata
 {
     private string $class;
 
@@ -19,6 +19,7 @@ class RelationMapping
         $mapping->class = $data['class'];
         $mapping->name = $data['name'];
         $mapping->isCollection = $data['expects'] === RelationExpectsEnum::MANY;
+
         //$mapping->lateUrl = $data['lateUrl'];
 
         return $mapping;
@@ -29,6 +30,11 @@ class RelationMapping
         return $this->class;
     }
 
+    public function getDefault(): ?array
+    {
+        return $this->isCollection ? [] : null;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -37,10 +43,5 @@ class RelationMapping
     public function isCollection(): bool
     {
         return $this->isCollection;
-    }
-
-    public function getDefault(): ?array
-    {
-        return $this->isCollection ? [] : null;
     }
 }

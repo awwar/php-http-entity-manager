@@ -6,19 +6,13 @@ use Generator;
 
 interface HttpEntityManagerInterface
 {
-    public function find(string $className, mixed $id, array $criteria = []): object;
-
-    public function persist(object $object): void;
-
-    public function remove(object $object): void;
-
     public function clear(string $objectName = null): void;
+
+    public function contains(object $object): bool;
 
     public function detach(object $object): void;
 
-    public function refresh(object $object): void;
-
-    public function merge(object $object): void;
+    public function find(string $className, mixed $id, array $criteria = []): object;
 
     public function flush(): void;
 
@@ -31,5 +25,11 @@ interface HttpEntityManagerInterface
         bool $isFilterOne = false
     ): Generator;
 
-    public function contains(object $object): bool;
+    public function merge(object $object): void;
+
+    public function persist(object $object): void;
+
+    public function refresh(object $object): void;
+
+    public function remove(object $object): void;
 }

@@ -2,6 +2,10 @@
 
 namespace Awwar\PhpHttpEntityManager\Http\Collection;
 
-interface Collection extends \Countable, \IteratorAggregate, \ArrayAccess
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+
+interface Collection extends Countable, IteratorAggregate, ArrayAccess
 {
 }

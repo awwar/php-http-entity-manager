@@ -15,18 +15,28 @@ class FieldsMetadata
         'beforeUpdate',
     ];
 
-    private array $relationFields = [];
-
-    private array $dataFields = [];
+    private array $dataFieldsSettings = [];
 
     private array $defaultValues = [];
 
-    private array $properties = [];
+    private array $allProperties = [];
 
     private array $scalarProperties = [];
 
+    private array $relationProperties = [];
+
+    public function __construct(private string $idProperty)
+    {
+    }
+
     public function addDataField(string $condition, string $fieldName, ?string $path): void
     {
+        if (isset($this->relationProperties[$fieldName])) {
+            throw new InvalidArgumentException(
+                sprintf('%s field already defined in relations', $fieldName)
+            );
+        }
+
         if (in_array($condition, self::AVAILABLE_CONDITIONS)) {
             throw new InvalidArgumentException(
                 sprintf(
@@ -38,12 +48,59 @@ class FieldsMetadata
         }
 
         $this->scalarProperties[$fieldName] = $fieldName;
-        $this->properties[$fieldName] = $fieldName;
+        $this->allProperties[$fieldName] = $fieldName;
 
         if ($path === null) {
             return;
         }
 
-        $this->dataFields[$condition][$fieldName] = $path;
+        $this->dataFieldsSettings[$condition][$fieldName] = $path;
+    }
+
+    public function addDefaultValue(string $fieldName, mixed $value): void
+    {
+        $this->defaultValues[$fieldName] = $value;
+    }
+
+    public function addRelationField(string $fieldName, RelationMetadata $setting): void
+    {
+        if (isset($this->scalarProperties[$fieldName])) {
+            throw new InvalidArgumentException(
+                sprintf('%s field already defined in relations', $fieldName)
+            );
+        }
+
+        $this->relationProperties[$fieldName] = $setting;
+        $this->allProperties[$fieldName] = $fieldName;
+    }
+
+    public function getAllProperties(): array
+    {
+        return $this->allProperties;
+    }
+
+    public function getDataFieldsSettings(): array
+    {
+        return $this->dataFieldsSettings;
+    }
+
+    public function getDefaultValues(): array
+    {
+        return $this->defaultValues;
+    }
+
+    public function getIdProperty(): string
+    {
+        return $this->idProperty;
+    }
+
+    public function getRelationProperties(): array
+    {
+        return $this->relationProperties;
+    }
+
+    public function getScalarProperties(): array
+    {
+        return $this->scalarProperties;
     }
 }

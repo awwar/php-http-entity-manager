@@ -21,6 +21,52 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
     ) {
     }
 
+    public function clear(string $objectName = null): void
+    {
+        $this->unitOfWork->clear($objectName);
+    }
+
+    public function contains(object $object): bool
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
+
+        return $this->unitOfWork->hasSuit($suit);
+    }
+
+    public function createEntityWithData(string $className, mixed $data): ?object
+    {
+        $suit = $this->entityAtelier->suitUpClass($className);
+
+        if ($data instanceof FullData) {
+            $suit->setIdAfterRead($data->getData());
+        } elseif ($data instanceof Reference) {
+            $suit->proxy(fn($obj) => $this->refresh($obj), $data->getId());
+        } elseif ($data instanceof NoData) {
+            return null;
+        } else {
+            throw new LogicException("Unable to map relation - invalid data type!");
+        }
+
+        if (false === $this->unitOfWork->hasSuit($suit)) {
+            $this->unitOfWork->commit($suit, false);
+
+            if ($data instanceof FullData) {
+                $suit->callAfterRead($data->getData(), $this);
+            }
+
+            $this->unitOfWork->upgrade($suit);
+        }
+
+        return $this->unitOfWork->getFromIdentity($suit)->getOriginal();
+    }
+
+    public function detach(object $object): void
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
+
+        $this->unitOfWork->remove($suit);
+    }
+
     public function find(string $className, mixed $id, array $criteria = []): object
     {
         $suit = $this->entityAtelier->suitUpClass($className);
@@ -41,50 +87,9 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         return $this->unitOfWork->getFromIdentity($suit)->getOriginal();
     }
 
-    public function persist(object $object): void
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        $this->unitOfWork->commit($suit);
-    }
-
     public function flush(): void
     {
         $this->unitOfWork->flush();
-    }
-
-    public function remove(object $object): void
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        $this->unitOfWork->delete($suit);
-    }
-
-    public function clear(string $objectName = null): void
-    {
-        $this->unitOfWork->clear($objectName);
-    }
-
-    public function detach(object $object): void
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        $this->unitOfWork->remove($suit);
-    }
-
-    public function refresh(object $object): void
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        $suit = $this->unitOfWork->getFromIdentity($suit);
-        $metadata = $suit->getMetadata();
-
-        $data = $metadata->getClient()->get(
-            $metadata->getUrlForOne($suit->getId()),
-            $metadata->getGetOneQuery()
-        );
-
-        $suit->callAfterRead($data, $this);
     }
 
     public function getRepository(string $className): HttpRepositoryInterface
@@ -92,18 +97,6 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         $suit = $this->entityAtelier->suitUpClass($className);
 
         return $suit->getMetadata()->getRepository() ?? new HttpRepository($this, $className);
-    }
-
-    public function contains(object $object): bool
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        return $this->unitOfWork->hasSuit($suit);
-    }
-
-    public function merge(object $object): void
-    {
-        throw new RuntimeException('Merge is not implemented!');
     }
 
     public function iterate(
@@ -158,30 +151,37 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         } while (true);
     }
 
-    public function createEntityWithData(string $className, mixed $data): ?object
+    public function merge(object $object): void
     {
-        $suit = $this->entityAtelier->suitUpClass($className);
+        throw new RuntimeException('Merge is not implemented!');
+    }
 
-        if ($data instanceof FullData) {
-            $suit->setIdAfterRead($data->getData());
-        } elseif ($data instanceof Reference) {
-            $suit->proxy(fn ($obj) => $this->refresh($obj), $data->getId());
-        } elseif ($data instanceof NoData) {
-            return null;
-        } else {
-            throw new LogicException("Unable to map relation - invalid data type!");
-        }
+    public function persist(object $object): void
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
 
-        if (false === $this->unitOfWork->hasSuit($suit)) {
-            $this->unitOfWork->commit($suit, false);
+        $this->unitOfWork->commit($suit);
+    }
 
-            if ($data instanceof FullData) {
-                $suit->callAfterRead($data->getData(), $this);
-            }
+    public function refresh(object $object): void
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
 
-            $this->unitOfWork->upgrade($suit);
-        }
+        $suit = $this->unitOfWork->getFromIdentity($suit);
+        $metadata = $suit->getMetadata();
 
-        return $this->unitOfWork->getFromIdentity($suit)->getOriginal();
+        $data = $metadata->getClient()->get(
+            $metadata->getUrlForOne($suit->getId()),
+            $metadata->getGetOneQuery()
+        );
+
+        $suit->callAfterRead($data, $this);
+    }
+
+    public function remove(object $object): void
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
+
+        $this->unitOfWork->delete($suit);
     }
 }

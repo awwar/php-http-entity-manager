@@ -8,13 +8,13 @@ class Data
     {
     }
 
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
     public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
     }
 }

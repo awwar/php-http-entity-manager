@@ -12,9 +12,13 @@ class HttpRepository implements HttpRepositoryInterface
     ) {
     }
 
-    public function find(mixed $id, array $criteria = []): object
+    public function add(object $object, bool $flush = false): void
     {
-        return $this->httpEntityManager->find($this->entityClass, $id, $criteria);
+        $this->httpEntityManager->persist($object);
+
+        if ($flush) {
+            $this->httpEntityManager->flush();
+        }
     }
 
     public function filter(array $filter = []): Generator
@@ -27,13 +31,9 @@ class HttpRepository implements HttpRepositoryInterface
         return $this->httpEntityManager->iterate($this->entityClass, $filter, isFilterOne: true)->current();
     }
 
-    public function add(object $object, bool $flush = false): void
+    public function find(mixed $id, array $criteria = []): object
     {
-        $this->httpEntityManager->persist($object);
-
-        if ($flush) {
-            $this->httpEntityManager->flush();
-        }
+        return $this->httpEntityManager->find($this->entityClass, $id, $criteria);
     }
 
     public function remove(object $object, bool $flush = false): void

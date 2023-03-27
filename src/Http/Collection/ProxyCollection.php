@@ -15,6 +15,13 @@ class ProxyCollection implements Collection
     {
     }
 
+    public function count(): int
+    {
+        $this->tryInit();
+
+        return count($this->collection);
+    }
+
     public function getIterator(): Traversable
     {
         $this->tryInit();
@@ -26,12 +33,14 @@ class ProxyCollection implements Collection
     public function offsetExists($offset): bool
     {
         $this->tryInit();
+
         return isset($this->collection[$offset]);
     }
 
     public function offsetGet($offset): mixed
     {
         $this->tryInit();
+
         return $this->collection[$offset];
     }
 
@@ -45,12 +54,6 @@ class ProxyCollection implements Collection
     {
         $this->tryInit();
         unset($this->collection[$offset]);
-    }
-
-    public function count(): int
-    {
-        $this->tryInit();
-        return count($this->collection);
     }
 
     private function tryInit(): void
