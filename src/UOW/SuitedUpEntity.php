@@ -5,6 +5,7 @@ namespace Awwar\PhpHttpEntityManager\UOW;
 use Adbar\Dot;
 use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
+use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Closure;
 use Exception;
 

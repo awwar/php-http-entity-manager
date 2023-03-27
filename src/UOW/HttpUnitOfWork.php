@@ -36,6 +36,10 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
     }
 
+    /**
+     * @throws IdentityNotFoundException
+     * @throws Exception
+     */
     public function upgrade(SuitedUpEntity $suit): void
     {
         if ($suit->isNew()) {
@@ -99,6 +103,10 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
     }
 
+    /**
+     * @throws IdentityNotFoundException
+     * @throws Exception
+     */
     public function flush(): void
     {
         $forCreate = [];
@@ -147,6 +155,9 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
     }
 
+    /**
+     * @throws IdentityNotFoundException
+     */
     public function getFromIdentity(SuitedUpEntity $suit): SuitedUpEntity
     {
         if (false === $this->hasSuit($suit)) {

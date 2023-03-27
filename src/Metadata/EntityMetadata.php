@@ -1,10 +1,11 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Awwar\PhpHttpEntityManager\Client\Client;
 use Awwar\PhpHttpEntityManager\Client\ClientInterface;
 use Awwar\PhpHttpEntityManager\Http\HttpRepositoryInterface;
+use Awwar\PhpHttpEntityManager\UOW\RelationMapping;
 use Closure;
 use ReflectionClass;
 use ReflectionException;
@@ -40,22 +41,18 @@ class EntityMetadata
      * @throws ReflectionException
      */
     public function __construct(
+        private string $name,
+        private string $idProperty,
         string $entityClassName,
         string $proxyClassName,
-        private ?string $idProperty,
         string $updateMethod,
         private bool $useDiffOnUpdate,
         private array $filterQuery,
         private array $getOneQuery,
         private array $filterOneQuery,
-        private string $name,
         mixed $httpClient,
         private ?HttpRepositoryInterface $repository,
-        private string $getOnePattern,
-        private string $getListPattern,
-        private string $createPattern,
-        private string $updatePattern,
-        private string $deletePattern,
+        private UrlMetadata $urlMetadata,
         array $dataFields,
         array $relationFields,
         array $defaultValues,
@@ -87,15 +84,15 @@ class EntityMetadata
             $this->defaultValues[$field] = $map['data']['value'];
         }
 
-        $this->proxy = (new ReflectionClass($this->proxyClassName))
+        $this->proxy = (new ReflectionClass($proxyClassName))
             ->newInstanceWithoutConstructor();
 
-        $this->emptyInstance = (new ReflectionClass($this->entityClassName))
+        $this->emptyInstance = (new ReflectionClass($entityClassName))
             ->newInstanceWithoutConstructor();
 
         $this->client = new Client(
-            $this->httpClient,
-            $this->updateMethod,
+            $httpClient,
+            $updateMethod,
             $this->name
         );
 
@@ -179,27 +176,27 @@ class EntityMetadata
 
     public function getUrlForCreate(): string
     {
-        return $this->createPattern;
+        return $this->urlMetadata->getCreate();
     }
 
     public function getUrlForList(): string
     {
-        return $this->getListPattern;
+        return $this->urlMetadata->getList();
     }
 
     public function getUrlForOne(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->getOnePattern);
+        return str_replace('{id}', (string) $id, $this->urlMetadata->getOne());
     }
 
     public function getUrlForUpdate(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->updatePattern);
+        return str_replace('{id}', (string) $id, $this->urlMetadata->getUpdate());
     }
 
     public function getUrlForDelete(mixed $id = null): string
     {
-        return str_replace('{id}', (string)$id, $this->deletePattern);
+        return str_replace('{id}', (string) $id, $this->urlMetadata->getDelete());
     }
 
     public function getFieldMap(string $name): array

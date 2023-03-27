@@ -3,6 +3,7 @@
 namespace Awwar\PhpHttpEntityManager\Http\Collection;
 
 use Closure;
+use Traversable;
 
 class ProxyCollection implements Collection
 {
@@ -14,7 +15,7 @@ class ProxyCollection implements Collection
     {
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
         $this->tryInit();
         foreach ($this->collection as $item) {

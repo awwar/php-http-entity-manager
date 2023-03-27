@@ -11,6 +11,7 @@ use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
 use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWorkInterface;
 use Generator;
 use LogicException;
+use RuntimeException;
 
 class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInterface
 {
@@ -102,7 +103,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
     public function merge(object $object): void
     {
-        throw new \RuntimeException('Merge is not implemented!');
+        throw new RuntimeException('Merge is not implemented!');
     }
 
     public function iterate(

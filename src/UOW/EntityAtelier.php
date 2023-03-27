@@ -2,6 +2,8 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
+use Awwar\PhpHttpEntityManager\Metadata\MetadataRegistryInterface;
+
 class EntityAtelier
 {
     public function __construct(private MetadataRegistryInterface $metadataRegistry)
