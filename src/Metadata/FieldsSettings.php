@@ -6,13 +6,20 @@ use InvalidArgumentException;
 
 class FieldsSettings
 {
-    const AVAILABLE_CONDITIONS = [
-        'afterRead',
+    public const REQUEST_CONDITIONS = [
+        'beforeCreate',
+        'beforeUpdate',
+    ];
+
+    public const RESPONSE_CONDITIONS = [
         'afterRead',
         'afterCreate',
         'afterUpdate',
-        'beforeCreate',
-        'beforeUpdate',
+    ];
+
+    public const AVAILABLE_CONDITIONS = [
+        ...self::REQUEST_CONDITIONS,
+        ...self::RESPONSE_CONDITIONS,
     ];
 
     private array $dataFieldsSettings = [];
@@ -29,7 +36,27 @@ class FieldsSettings
     {
     }
 
-    public function addDataField(string $condition, string $fieldName, ?string $path): void
+    public function addOnRequestDataFieldMap(string $fieldName, ?string $path): void
+    {
+        foreach (self::REQUEST_CONDITIONS as $condition) {
+            $this->addDataFieldMap($condition, $fieldName, $path);
+        }
+    }
+
+    public function addOnResponseDataFieldMap(string $fieldName, ?string $path): void
+    {
+        foreach (self::RESPONSE_CONDITIONS as $condition) {
+            $this->addDataFieldMap($condition, $fieldName, $path);
+        }
+    }
+
+    public function addAllCasesDataFieldMap(string $fieldName, ?string $path): void
+    {
+        $this->addOnRequestDataFieldMap($fieldName, $path);
+        $this->addOnResponseDataFieldMap($fieldName, $path);
+    }
+
+    public function addDataFieldMap(string $condition, string $fieldName, ?string $path): void
     {
         if (isset($this->relationProperties[$fieldName])) {
             throw new InvalidArgumentException(
@@ -37,7 +64,7 @@ class FieldsSettings
             );
         }
 
-        if (in_array($condition, self::AVAILABLE_CONDITIONS)) {
+        if (in_array($condition, self::AVAILABLE_CONDITIONS) === false) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Field %s must be one of %s',

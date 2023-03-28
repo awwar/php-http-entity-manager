@@ -12,6 +12,13 @@ interface HttpEntityManagerInterface
 
     public function detach(object $object): void;
 
+    /**
+     * @psalm-template  RealInstanceType of object
+     * @psalm-param class-string<RealInstanceType> $className
+     * @psalm-param string|int $id
+     * @psalm-param array $criteria
+     * @psalm-return RealInstanceType
+     */
     public function find(string $className, mixed $id, array $criteria = []): object;
 
     public function flush(): void;

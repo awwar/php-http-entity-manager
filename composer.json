@@ -15,7 +15,9 @@
     }
   },
   "autoload-dev": {
-    "psr-4": { "Awwar\\PhpHttpEntityManager\\Tests\\": "tests/" }
+    "psr-4": {
+      "Awwar\\PhpHttpEntityManager\\Tests\\": "tests/"
+    }
   },
   "require-dev": {
     "phpstan/phpstan": "^1.8.0",

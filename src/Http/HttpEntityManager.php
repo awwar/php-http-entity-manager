@@ -67,6 +67,9 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         $this->unitOfWork->remove($suit);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function find(string $className, mixed $id, array $criteria = []): object
     {
         $suit = $this->entityAtelier->suitUpClass($className);

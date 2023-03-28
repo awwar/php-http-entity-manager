@@ -34,5 +34,6 @@ class EntityMetadataTest extends TestCase
         self::assertSame('/api/entity_stub/', $metadata->getUrlForList());
         self::assertSame('/api/entity_stub/12/', $metadata->getUrlForOne(12));
         self::assertSame('/api/entity_stub/13/', $metadata->getUrlForUpdate(13));
+        self::assertSame($client, $metadata->getClient());
     }
 }

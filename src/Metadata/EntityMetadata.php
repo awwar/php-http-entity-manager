@@ -104,7 +104,7 @@ class EntityMetadata
 
     public function getFieldMap(string $name): array
     {
-        return $this->dataFields[$name] ?? [];
+        return $this->fieldsSettings->getDataFieldsSettings()[$name] ?? [];
     }
 
     public function getFilterOneQuery(): array
