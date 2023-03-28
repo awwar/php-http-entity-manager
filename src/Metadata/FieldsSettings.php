@@ -103,7 +103,7 @@ class FieldsSettings
 
     public function getAllProperties(): array
     {
-        return $this->allProperties;
+        return array_values($this->allProperties);
     }
 
     public function getDataFieldsSettings(): array
@@ -128,6 +128,6 @@ class FieldsSettings
 
     public function getScalarProperties(): array
     {
-        return $this->scalarProperties;
+        return array_values($this->scalarProperties);
     }
 }

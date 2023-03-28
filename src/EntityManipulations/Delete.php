@@ -13,7 +13,9 @@ class Delete implements ManipulationCommandInterface
     public function execute(): void
     {
         $metadata = $this->suit->getMetadata();
-        $metadata->getClient()->delete($metadata->getUrlForDelete($this->suit->getId()));
+        $url = $metadata->getUrlForDelete($this->suit->getId());
+
+        $metadata->getClient()->delete($url);
     }
 
     public function getSuit(): SuitedUpEntity

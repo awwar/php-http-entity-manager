@@ -3,26 +3,22 @@
 namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
+use InvalidArgumentException;
 
 class RelationSettings
 {
-    private string $class;
-
-    private string $name;
-
     private bool $isCollection;
 
-    public static function create(array $data): self
-    {
-        $mapping = new self();
+    public function __construct(
+        private string $class,
+        private string $name,
+        int $expects
+    ) {
+        if (in_array($expects, RelationExpectsEnum::ALL) === false) {
+            throw new InvalidArgumentException('Relation expectation must be only "many", "one"');
+        }
 
-        $mapping->class = $data['class'];
-        $mapping->name = $data['name'];
-        $mapping->isCollection = $data['expects'] === RelationExpectsEnum::MANY;
-
-        //$mapping->lateUrl = $data['lateUrl'];
-
-        return $mapping;
+        $this->isCollection = $expects === RelationExpectsEnum::MANY;
     }
 
     public function getClass(): string

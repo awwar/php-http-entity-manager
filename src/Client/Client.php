@@ -27,9 +27,9 @@ class Client implements ClientInterface
         return $this->makeRequest(RequestEnum::METHOD_POST, $path, ['json' => $data]);
     }
 
-    public function delete(string $path): void
+    public function delete(string $path, array $query = []): void
     {
-        $this->makeRequest(RequestEnum::METHOD_DELETE, $path);
+        $this->makeRequest(RequestEnum::METHOD_DELETE, $path, ['query' => $query]);
     }
 
     public function get(string $path, array $query = []): array

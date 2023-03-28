@@ -15,15 +15,11 @@ class Update implements ManipulationCommandInterface
 
     public function execute(): void
     {
-        $data = $this->suit->callBeforeUpdate(
-            $this->entityChanges,
-            $this->relationChanges,
-            $this->suit->getScalarSnapshot(),
-            $this->suit->getRelationValues(),
-        );
         $metadata = $this->suit->getMetadata();
+        $url = $metadata->getUrlForUpdate($this->suit->getId());
+        $data = $this->suit->callBeforeUpdate($this->entityChanges, $this->relationChanges);
 
-        $result = $metadata->getClient()->update($metadata->getUrlForUpdate($this->suit->getId()), $data);
+        $result = $metadata->getClient()->update($url, $data);
 
         $this->suit->callAfterUpdate($result);
     }

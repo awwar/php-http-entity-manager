@@ -12,10 +12,11 @@ class Create implements ManipulationCommandInterface
 
     public function execute(): void
     {
-        $data = $this->suit->callBeforeCreate($this->suit->getScalarSnapshot(), $this->suit->getRelationValues());
         $metadata = $this->suit->getMetadata();
+        $url = $metadata->getUrlForCreate();
+        $data = $this->suit->callBeforeCreate();
 
-        $response = $metadata->getClient()->create($metadata->getUrlForCreate(), $data);
+        $response = $metadata->getClient()->create($url, $data);
 
         $this->suit->callAfterCreate($response);
     }

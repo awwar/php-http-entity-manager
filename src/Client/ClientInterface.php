@@ -6,7 +6,7 @@ interface ClientInterface
 {
     public function create(string $path, array $data = []): array;
 
-    public function delete(string $path): void;
+    public function delete(string $path, array $query = []): void;
 
     public function get(string $path, array $query = []): array;
 

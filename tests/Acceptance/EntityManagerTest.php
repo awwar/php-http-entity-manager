@@ -173,6 +173,7 @@ class EntityManagerTest extends TestCase
                     'DELETE',
                     '/api/entity_stub/11/',
                     [
+                        'query' => [],
                     ],
                 ]
             )->willReturnOnConsecutiveCalls(

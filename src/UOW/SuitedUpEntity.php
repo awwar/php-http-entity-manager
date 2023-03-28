@@ -51,7 +51,7 @@ class SuitedUpEntity
         $this->mapScalarData($map, $data);
     }
 
-    public function callBeforeCreate(array $entityData, array $relationData): array
+    public function callBeforeCreate(): array
     {
         $map = $this->entityMetadata->getFieldMap('beforeCreate');
 
@@ -59,8 +59,8 @@ class SuitedUpEntity
             $this->original,
             [],
             [],
-            $entityData,
-            $relationData
+            $this->getScalarSnapshot(),
+            $this->getRelationValues(),
         );
 
         $dot = new Dot($layout);
@@ -81,16 +81,14 @@ class SuitedUpEntity
     public function callBeforeUpdate(
         array $entityChanges,
         array $relationChanges,
-        array $entityData,
-        array $relationData
     ): array {
         $map = $this->entityMetadata->getFieldMap('beforeUpdate');
         $layout = $this->entityMetadata->getUpdateLayout()(
             $this->original,
             $entityChanges,
             $relationChanges,
-            $entityData,
-            $relationData,
+            $this->getScalarSnapshot(),
+            $this->getRelationValues(),
         );
 
         $dot = new Dot($layout);
