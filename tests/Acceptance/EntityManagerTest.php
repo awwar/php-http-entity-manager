@@ -3,11 +3,17 @@
 namespace Awwar\PhpHttpEntityManager\Tests\Acceptance;
 
 use Awwar\PhpHttpEntityManager\Client\Client;
+use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 use Awwar\PhpHttpEntityManager\Http\HttpEntityManager;
+use Awwar\PhpHttpEntityManager\Metadata\CallbacksSettings;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\FieldsSettings;
 use Awwar\PhpHttpEntityManager\Metadata\MetadataRegistry;
-use Awwar\PhpHttpEntityManager\Tests\Stubs\EntityStub;
+use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
+use Awwar\PhpHttpEntityManager\Tests\Stubs\DealEntityProxyStub;
+use Awwar\PhpHttpEntityManager\Tests\Stubs\DealEntityStub;
+use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityProxyStub;
+use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityStub;
 use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
 use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWork;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -37,7 +43,7 @@ class EntityManagerTest extends TestCase
             ->method('request')
             ->with(
                 'POST',
-                '/api/entity_stub/',
+                '/api/user_entity_stub/',
                 [
                     'json' => [
                         'data' => [
@@ -47,7 +53,7 @@ class EntityManagerTest extends TestCase
                 ]
             )->willReturn($response);
 
-        $entity = new EntityStub();
+        $entity = new UserEntityStub();
         $entity->name = 'Alyx';
 
         $this->entityManager->persist($entity);
@@ -82,14 +88,14 @@ class EntityManagerTest extends TestCase
             ->withConsecutive(
                 [
                     'GET',
-                    '/api/entity_stub/11/',
+                    '/api/user_entity_stub/11/',
                     [
                         'query' => [],
                     ],
                 ],
                 [
                     'PATCH',
-                    '/api/entity_stub/11/',
+                    '/api/user_entity_stub/11/',
                     [
                         'json' => [
                             'data' => [
@@ -103,7 +109,7 @@ class EntityManagerTest extends TestCase
                 $responseOnPatch,
             );
 
-        $entity = $this->entityManager->find(EntityStub::class, 11);
+        $entity = $this->entityManager->find(UserEntityStub::class, 11);
         $entity->name = 'Sasha';
 
         $this->entityManager->flush();
@@ -128,13 +134,13 @@ class EntityManagerTest extends TestCase
             ->method('request')
             ->with(
                 'GET',
-                '/api/entity_stub/11/',
+                '/api/user_entity_stub/11/',
                 [
                     'query' => [],
                 ],
             )->willReturn($responseOnGet);
 
-        $entity = $this->entityManager->find(EntityStub::class, 11);
+        $entity = $this->entityManager->find(UserEntityStub::class, 11);
         $entity->name = 'Alyx';
 
         $this->entityManager->flush();
@@ -164,14 +170,14 @@ class EntityManagerTest extends TestCase
             ->withConsecutive(
                 [
                     'GET',
-                    '/api/entity_stub/11/',
+                    '/api/user_entity_stub/11/',
                     [
                         'query' => [],
                     ],
                 ],
                 [
                     'DELETE',
-                    '/api/entity_stub/11/',
+                    '/api/user_entity_stub/11/',
                     [
                         'query' => [],
                     ],
@@ -181,7 +187,7 @@ class EntityManagerTest extends TestCase
                 $responseOnDelete,
             );
 
-        $entity = $this->entityManager->find(EntityStub::class, 11);
+        $entity = $this->entityManager->find(UserEntityStub::class, 11);
         $entity->name = 'Sasha';
 
         $this->entityManager->remove($entity);
@@ -189,6 +195,42 @@ class EntityManagerTest extends TestCase
 
         self::assertSame(11, $entity->id);
         self::assertSame('Sasha', $entity->name);
+    }
+
+    public function testGetWhenRelation(): void
+    {
+        $responseOnGet = $this->createMock(ResponseInterface::class);
+        $responseOnGet->method('toArray')->willReturn(
+            [
+                'data' => [
+                    'id'     => 11,
+                    'amount' => 123,
+                    'user'   => [
+                        'id' => 15,
+                    ],
+                ],
+            ]
+        );
+
+        $this->httpClientMock
+            ->expects(self::exactly(1))
+            ->method('request')
+            ->with(
+                'GET',
+                '/api/deal_entity_stub/11/',
+                [
+                    'query' => [],
+                ],
+            )->willReturn(
+                $responseOnGet,
+            );
+
+        $entity = $this->entityManager->find(DealEntityStub::class, 11);
+
+        self::assertSame(11, $entity->id);
+        self::assertSame(123, $entity->amount);
+        self::assertInstanceOf(UserEntityProxyStub::class, $entity->user);
+        self::assertSame(15, $entity->user->id);
     }
 
     protected function setUp(): void
@@ -201,17 +243,37 @@ class EntityManagerTest extends TestCase
             updateMethod: 'PATCH',
             entityName: 'EntityStub'
         );
-        $fieldsMetadata = new FieldsSettings('id');
-        $fieldsMetadata->addAllCasesDataFieldMap('id', 'data.id');
-        $fieldsMetadata->addAllCasesDataFieldMap('name', 'data.name');
+        $userFieldsMetadata = new FieldsSettings('id');
+        $userFieldsMetadata->addAllCasesDataFieldMap('id', 'data.id');
+        $userFieldsMetadata->addAllCasesDataFieldMap('name', 'data.name');
 
-        $metadata = new EntityMetadata(
-            entityClassName: EntityStub::class,
-            fieldsSettings: $fieldsMetadata,
-            client: $client
+        $userMetadata = new EntityMetadata(
+            entityClassName: UserEntityStub::class,
+            fieldsSettings: $userFieldsMetadata,
+            client: $client,
+            proxyClassName: UserEntityProxyStub::class
         );
 
-        $metadataRegistry = new MetadataRegistry([$metadata]);
+        $dealFieldsMetadata = new FieldsSettings('id');
+        $dealFieldsMetadata->addAllCasesDataFieldMap('id', 'data.id');
+        $dealFieldsMetadata->addAllCasesDataFieldMap('amount', 'data.amount');
+        $dealFieldsMetadata->addRelationField('user', new RelationSettings(
+            class: UserEntityStub::class,
+            name: 'user',
+            expects: RelationExpectsEnum::ONE
+        ));
+
+        $callbackSetting = new CallbacksSettings(relationMapperMethod: 'mapper');
+
+        $dealMetadata = new EntityMetadata(
+            entityClassName: DealEntityStub::class,
+            fieldsSettings: $dealFieldsMetadata,
+            client: $client,
+            proxyClassName: DealEntityProxyStub::class,
+            callbacksSettings: $callbackSetting
+        );
+
+        $metadataRegistry = new MetadataRegistry([$userMetadata, $dealMetadata]);
         $entityAtelier = new EntityAtelier($metadataRegistry);
         $uow = new HttpUnitOfWork();
         $this->entityManager = new HttpEntityManager(

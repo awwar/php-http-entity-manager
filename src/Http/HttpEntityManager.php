@@ -52,9 +52,9 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
             if ($data instanceof FullData) {
                 $suit->callAfterRead($data->getData(), $this);
-            }
 
-            $this->unitOfWork->upgrade($suit);
+                $this->unitOfWork->upgrade($suit);
+            }
         }
 
         return $this->unitOfWork->getFromIdentity($suit)->getOriginal();

@@ -63,8 +63,10 @@ class EntityMetadata
         }
 
         if ($callbacksSettings === null) {
-            $this->callbacksSettings = new CallbacksSettings();
+            $callbacksSettings = new CallbacksSettings();
         }
+
+        $this->callbacksSettings = $callbacksSettings;
     }
 
     public function getClassName(): string

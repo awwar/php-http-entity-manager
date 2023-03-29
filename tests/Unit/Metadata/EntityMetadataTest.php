@@ -5,7 +5,7 @@ namespace Awwar\PhpHttpEntityManager\Tests\Unit\Metadata;
 use Awwar\PhpHttpEntityManager\Client\Client;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\FieldsSettings;
-use Awwar\PhpHttpEntityManager\Tests\Stubs\EntityStub;
+use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityStub;
 use Awwar\PhpHttpEntityManager\Tests\Stubs\HttpClientStub;
 use PHPUnit\Framework\TestCase;
 
@@ -21,13 +21,13 @@ class EntityMetadataTest extends TestCase
         $fieldsMetadata = new FieldsSettings('id');
 
         $metadata = new EntityMetadata(
-            entityClassName: EntityStub::class,
+            entityClassName: UserEntityStub::class,
             fieldsSettings: $fieldsMetadata,
             client: $client
         );
 
         self::assertSame('id', $metadata->getIdProperty());
-        self::assertSame(EntityStub::class, $metadata->getClassName());
+        self::assertSame(UserEntityStub::class, $metadata->getClassName());
         self::assertSame('entity_stub', $metadata->getName());
         self::assertSame('/api/entity_stub/', $metadata->getUrlForCreate());
         self::assertSame('/api/entity_stub/11/', $metadata->getUrlForDelete(11));
