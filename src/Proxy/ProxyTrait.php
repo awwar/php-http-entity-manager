@@ -24,6 +24,10 @@ trait ProxyTrait
 
     public function __get(string $name): mixed
     {
+        if ($name === '__initialized') {
+            return $this->__initialized;
+        }
+
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
             $this->__initialized = true;
             call_user_func($this->__manager, $this);

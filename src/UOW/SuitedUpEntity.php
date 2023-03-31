@@ -423,7 +423,7 @@ class SuitedUpEntity
             throw new Exception("Unable to get uniqueId when entity is new!");
         }
 
-        return sha1($this->getEntityId($entity) . get_class($entity));
+        return sha1($this->getEntityId($entity) . $this->entityMetadata->getClassName());
     }
 
     private function getRelationValue(object $object, string $property, RelationSettings $mapping): mixed

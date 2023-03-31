@@ -2,7 +2,9 @@
 
 namespace Awwar\PhpHttpEntityManager\DataStructure;
 
-class SmartMap implements \ArrayAccess
+use ArrayAccess;
+
+class SmartMap implements ArrayAccess
 {
     public function __construct(private array $map = [])
     {

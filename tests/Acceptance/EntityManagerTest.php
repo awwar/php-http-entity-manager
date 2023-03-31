@@ -161,7 +161,7 @@ class EntityManagerTest extends TestCase
         self::assertSame('Sasha', $entity->name);
     }
 
-    public function testGetWhenRelation(): void
+    public function testGetWhenRelationIsProxyNotLoaded(): void
     {
         $this->httpClientMock
             ->expects(self::once())
@@ -181,12 +181,133 @@ class EntityManagerTest extends TestCase
                 ]
             );
 
+        /** @var DealEntityStub $entity */
         $entity = $this->entityManager->find(DealEntityStub::class, 11);
 
         self::assertSame(11, $entity->id);
         self::assertSame(123, $entity->amount);
         self::assertInstanceOf(UserEntityProxyStub::class, $entity->user);
         self::assertSame(15, $entity->user->id);
+        self::assertFalse($entity->user->__initialized);
+    }
+
+    public function testGetWhenRelationIsProxyLoaded(): void
+    {
+        $this->httpClientMock
+            ->expects(self::exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['/api/deal_entity_stub/11/', []],
+                ['/api/user_entity_stub/15/', []]
+            )->willReturnOnConsecutiveCalls(
+                [
+                    'data' => [
+                        'id'     => 11,
+                        'amount' => 123,
+                        'user'   => [
+                            'id' => 15,
+                        ],
+                    ],
+                ],
+                [
+                    'data' => [
+                        'id'   => 15,
+                        'name' => 'Alyx',
+                    ],
+                ]
+            );
+
+        /** @var DealEntityStub $deal */
+        $deal = $this->entityManager->find(DealEntityStub::class, 11);
+
+        self::assertNull($deal->admin);
+        self::assertInstanceOf(UserEntityProxyStub::class, $deal->user);
+        self::assertSame(15, $deal->user->id);
+        self::assertSame('Alyx', $deal->user->name);
+        self::assertTrue($deal->user->__initialized);
+
+        /** @var UserEntityStub $entity */
+        $user = $this->entityManager->find(UserEntityStub::class, 15);
+
+        self::assertSame($user, $deal->user);
+    }
+
+    public function testGetWhenRelationIsFullLoaded(): void
+    {
+        $this->httpClientMock
+            ->expects(self::exactly(1))
+            ->method('get')
+            ->withConsecutive(
+                ['/api/deal_entity_stub/11/', []],
+            )->willReturnOnConsecutiveCalls(
+                [
+                    'data' => [
+                        'id'     => 11,
+                        'amount' => 123,
+                        'user'   => [
+                            'id' => 15,
+                        ],
+                        'admin'  => [
+                            'id'   => 16,
+                            'name' => 'Piter',
+                        ],
+                    ],
+                ],
+            );
+
+        /** @var DealEntityStub $deal */
+        $deal = $this->entityManager->find(DealEntityStub::class, 11);
+
+        // Proxy user
+        self::assertInstanceOf(UserEntityProxyStub::class, $deal->user);
+        self::assertSame(15, $deal->user->id);
+
+        // Proxy admin
+        self::assertInstanceOf(UserEntityStub::class, $deal->admin);
+        self::assertSame(16, $deal->admin->id);
+        self::assertSame('Piter', $deal->admin->name);
+
+        /** @var UserEntityStub $admin */
+        $admin = $this->entityManager->find(UserEntityStub::class, 16);
+
+        self::assertSame($admin, $deal->admin);
+    }
+
+    public function testGetWhenSameRelationEntitiesInitAsFullLoadedAndProxy(): void
+    {
+        $this->httpClientMock
+            ->expects(self::exactly(1))
+            ->method('get')
+            ->withConsecutive(
+                ['/api/deal_entity_stub/11/', []],
+            )->willReturnOnConsecutiveCalls(
+                [
+                    'data' => [
+                        'id'     => 11,
+                        'amount' => 123,
+                        'user'   => [
+                            'id' => 15,
+                        ],
+                        'admin'  => [
+                            'id'   => 15,
+                            'name' => 'Piter',
+                        ],
+                    ],
+                ],
+            );
+
+        /** @var DealEntityStub $deal */
+        $deal = $this->entityManager->find(DealEntityStub::class, 11);
+
+        // Proxy admin
+        self::assertInstanceOf(UserEntityStub::class, $deal->admin);
+        self::assertSame(15, $deal->admin->id);
+        self::assertSame('Piter', $deal->admin->name);
+
+        // Proxy user
+        self::assertInstanceOf(UserEntityProxyStub::class, $deal->user);
+        self::assertSame(15, $deal->user->id);
+        self::assertSame('Piter', $deal->user->name);
     }
 
     protected function setUp(): void
@@ -211,6 +332,11 @@ class EntityManagerTest extends TestCase
         $dealFieldsMetadata->addRelationField('user', new RelationSettings(
             class: UserEntityStub::class,
             name: 'user',
+            expects: RelationExpectsEnum::ONE
+        ));
+        $dealFieldsMetadata->addRelationField('admin', new RelationSettings(
+            class: UserEntityStub::class,
+            name: 'admin',
             expects: RelationExpectsEnum::ONE
         ));
 
