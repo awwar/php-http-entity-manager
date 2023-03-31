@@ -20,26 +20,22 @@ class SmartMap implements \ArrayAccess
         }
 
         $pathList = explode('.', $path);
-        $lastIndex = count($pathList) - 1;
-
         $buffer = $this->map;
-        $prev = &$buffer;
+        $current =& $buffer;
 
         foreach ($pathList as $i => $segment) {
-            if ($i === $lastIndex) {
-                $prev[$segment] = $value;
-                break;
-            }
-            $prev[$segment] = $buffer[$segment] ?? [];
-            $prev = &$prev[$segment];
+            $current[$segment] = $buffer[$segment] ?? [];
+            $current =& $current[$segment];
         }
+
+        $current = $value;
 
         $this->map = $buffer;
     }
 
     public function get(?string $path = null, mixed $default = null): mixed
     {
-        if ($path === null) {
+        if ($path === '') {
             return $this->map;
         }
 
@@ -47,7 +43,7 @@ class SmartMap implements \ArrayAccess
             return $this->map[$path];
         }
 
-        if (!is_string($path) || !str_contains($path, '.')) {
+        if ($path === null || !str_contains($path, '.')) {
             return $default;
         }
 
@@ -58,8 +54,7 @@ class SmartMap implements \ArrayAccess
             if (!is_array($buffer) || false === isset($buffer[$segment])) {
                 return $default;
             }
-
-            $buffer = &$buffer[$segment];
+            $buffer =& $buffer[$segment];
         }
 
         return $buffer;
