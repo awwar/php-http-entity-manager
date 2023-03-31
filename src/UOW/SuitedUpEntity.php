@@ -2,9 +2,9 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
-use Adbar\Dot;
 use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
+use Awwar\PhpHttpEntityManager\DataStructure\SmartMap;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use Closure;
@@ -63,7 +63,7 @@ class SuitedUpEntity
             $this->getRelationValues(),
         );
 
-        $dot = new Dot($layout);
+        $smartMap = new SmartMap($layout);
         foreach ($map as $field => $path) {
             if (
                 $field === $this->getMetadata()->getIdProperty()
@@ -72,10 +72,10 @@ class SuitedUpEntity
                 continue;
             }
 
-            $dot->set($path, $this->getValue($this->original, $field));
+            $smartMap->put($path, $this->getValue($this->original, $field));
         }
 
-        return $dot->all();
+        return $smartMap->toArray();
     }
 
     public function callBeforeUpdate(
@@ -91,7 +91,7 @@ class SuitedUpEntity
             $this->getRelationValues(),
         );
 
-        $dot = new Dot($layout);
+        $smartMap = new SmartMap($layout);
 
         if ($this->entityMetadata->isUseDiffOnUpdate()) {
             foreach ($entityChanges as $field => $value) {
@@ -99,7 +99,7 @@ class SuitedUpEntity
                 if ($path === null) {
                     continue;
                 }
-                $dot->set($path, $value);
+                $smartMap->put($path, $value);
             }
         } else {
             foreach ($map as $field => $path) {
@@ -107,11 +107,11 @@ class SuitedUpEntity
                     continue;
                 }
 
-                $dot->set($path, $this->getValue($this->original, $field));
+                $smartMap->put($path, $this->getValue($this->original, $field));
             }
         }
 
-        return $dot->all();
+        return $smartMap->toArray();
     }
 
     public function delete(): void
@@ -343,9 +343,9 @@ class SuitedUpEntity
     {
         $map = $this->entityMetadata->getFieldMap('afterRead');
         $idProperty = $this->entityMetadata->getIdProperty();
-        $dot = new Dot($data);
+        $smartMap = new SmartMap($data);
 
-        $this->setId($this->getByDot($dot, $map[$idProperty], $idProperty));
+        $this->setId($this->getByDot($smartMap, $map[$idProperty], $idProperty));
     }
 
     //public function isLateProxy(): bool
@@ -385,11 +385,11 @@ class SuitedUpEntity
         return $mapping->isCollection() ? new GeneralCollection($result) : array_pop($result);
     }
 
-    private function getByDot(Dot $dot, string $path, string $field): mixed
+    private function getByDot(SmartMap $smartMap, string $path, string $field): mixed
     {
         $default = $this->getMetadata()->getDefaultValue($field);
 
-        return $dot->get($path, $default);
+        return $smartMap->get($path, $default);
     }
 
     private function getEntityId(object $entity): ?string
@@ -467,10 +467,10 @@ class SuitedUpEntity
 
     private function mapScalarData(array $map, array $data): void
     {
-        $dot = new Dot($data);
+        $smartMap = new SmartMap($data);
 
         foreach ($map as $field => $path) {
-            $this->setValue($this->original, $field, $this->getByDot($dot, $path, $field));
+            $this->setValue($this->original, $field, $this->getByDot($smartMap, $path, $field));
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\Tests\Acceptance;
 
-use Awwar\PhpHttpEntityManager\Client\Client;
+use Awwar\PhpHttpEntityManager\Client\ClientInterface;
 use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 use Awwar\PhpHttpEntityManager\Http\HttpEntityManager;
 use Awwar\PhpHttpEntityManager\Metadata\CallbacksSettings;
@@ -18,8 +18,6 @@ use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
 use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWork;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class EntityManagerTest extends TestCase
 {
@@ -29,29 +27,24 @@ class EntityManagerTest extends TestCase
 
     public function testFlushWhenCreate(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'   => 11,
-                    'name' => 'Alyx',
-                ],
-            ]
-        );
         $this->httpClientMock
             ->expects(self::once())
-            ->method('request')
+            ->method('create')
             ->with(
-                'POST',
                 '/api/user_entity_stub/',
                 [
-                    'json' => [
-                        'data' => [
-                            'name' => 'Alyx',
-                        ],
+                    'data' => [
+                        'name' => 'Alyx',
                     ],
                 ]
-            )->willReturn($response);
+            )->willReturn(
+                [
+                    'data' => [
+                        'id'   => 11,
+                        'name' => 'Alyx',
+                    ],
+                ]
+            );
 
         $entity = new UserEntityStub();
         $entity->name = 'Alyx';
@@ -64,49 +57,38 @@ class EntityManagerTest extends TestCase
 
     public function testFlushWhenUpdate(): void
     {
-        $responseOnGet = $this->createMock(ResponseInterface::class);
-        $responseOnGet->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'   => 11,
-                    'name' => 'Alyx',
-                ],
-            ]
-        );
-        $responseOnPatch = $this->createMock(ResponseInterface::class);
-        $responseOnPatch->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'   => 11,
-                    'name' => 'Sasha',
-                ],
-            ]
-        );
         $this->httpClientMock
-            ->expects(self::exactly(2))
-            ->method('request')
-            ->withConsecutive(
+            ->expects(self::once())
+            ->method('get')
+            ->with(
+                '/api/user_entity_stub/11/',
+                []
+            )->willReturn(
                 [
-                    'GET',
-                    '/api/user_entity_stub/11/',
-                    [
-                        'query' => [],
-                    ],
-                ],
-                [
-                    'PATCH',
-                    '/api/user_entity_stub/11/',
-                    [
-                        'json' => [
-                            'data' => [
-                                'name' => 'Sasha',
-                            ],
-                        ],
+                    'data' => [
+                        'id'   => 11,
+                        'name' => 'Alyx',
                     ],
                 ]
-            )->willReturnOnConsecutiveCalls(
-                $responseOnGet,
-                $responseOnPatch,
+            );
+
+        $this->httpClientMock
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                '/api/user_entity_stub/11/',
+                [
+                    'data' => [
+                        'name' => 'Sasha',
+                    ],
+                ]
+            )->willReturn(
+                [
+                    'data' => [
+                        'id'   => 11,
+                        'name' => 'Sasha',
+                    ],
+                ]
             );
 
         $entity = $this->entityManager->find(UserEntityStub::class, 11);
@@ -120,25 +102,20 @@ class EntityManagerTest extends TestCase
 
     public function testFlushWhenUpdateButNothingChanged(): void
     {
-        $responseOnGet = $this->createMock(ResponseInterface::class);
-        $responseOnGet->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'   => 11,
-                    'name' => 'Alyx',
-                ],
-            ]
-        );
         $this->httpClientMock
-            ->expects(self::exactly(1))
-            ->method('request')
+            ->expects(self::once())
+            ->method('get')
             ->with(
-                'GET',
                 '/api/user_entity_stub/11/',
+                []
+            )->willReturn(
                 [
-                    'query' => [],
-                ],
-            )->willReturn($responseOnGet);
+                    'data' => [
+                        'id'   => 11,
+                        'name' => 'Alyx',
+                    ],
+                ]
+            );
 
         $entity = $this->entityManager->find(UserEntityStub::class, 11);
         $entity->name = 'Alyx';
@@ -151,40 +128,27 @@ class EntityManagerTest extends TestCase
 
     public function testFlushWhenDelete(): void
     {
-        $responseOnGet = $this->createMock(ResponseInterface::class);
-        $responseOnGet->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'   => 11,
-                    'name' => 'Alyx',
-                ],
-            ]
-        );
-        $responseOnDelete = $this->createMock(ResponseInterface::class);
-        $responseOnDelete->method('toArray')->willReturn(
-            []
-        );
         $this->httpClientMock
-            ->expects(self::exactly(2))
-            ->method('request')
-            ->withConsecutive(
+            ->expects(self::once())
+            ->method('get')
+            ->with(
+                '/api/user_entity_stub/11/',
+                []
+            )->willReturn(
                 [
-                    'GET',
-                    '/api/user_entity_stub/11/',
-                    [
-                        'query' => [],
-                    ],
-                ],
-                [
-                    'DELETE',
-                    '/api/user_entity_stub/11/',
-                    [
-                        'query' => [],
+                    'data' => [
+                        'id'   => 11,
+                        'name' => 'Alyx',
                     ],
                 ]
-            )->willReturnOnConsecutiveCalls(
-                $responseOnGet,
-                $responseOnDelete,
+            );
+
+        $this->httpClientMock
+            ->expects(self::once())
+            ->method('delete')
+            ->with(
+                '/api/user_entity_stub/11/',
+                []
             );
 
         $entity = $this->entityManager->find(UserEntityStub::class, 11);
@@ -199,30 +163,22 @@ class EntityManagerTest extends TestCase
 
     public function testGetWhenRelation(): void
     {
-        $responseOnGet = $this->createMock(ResponseInterface::class);
-        $responseOnGet->method('toArray')->willReturn(
-            [
-                'data' => [
-                    'id'     => 11,
-                    'amount' => 123,
-                    'user'   => [
-                        'id' => 15,
-                    ],
-                ],
-            ]
-        );
-
         $this->httpClientMock
-            ->expects(self::exactly(1))
-            ->method('request')
+            ->expects(self::once())
+            ->method('get')
             ->with(
-                'GET',
                 '/api/deal_entity_stub/11/',
-                [
-                    'query' => [],
-                ],
+                []
             )->willReturn(
-                $responseOnGet,
+                [
+                    'data' => [
+                        'id'     => 11,
+                        'amount' => 123,
+                        'user'   => [
+                            'id' => 15,
+                        ],
+                    ],
+                ]
             );
 
         $entity = $this->entityManager->find(DealEntityStub::class, 11);
@@ -237,12 +193,7 @@ class EntityManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->httpClientMock = $this->createMock(HttpClientInterface::class);
-        $client = new Client(
-            client: $this->httpClientMock,
-            updateMethod: 'PATCH',
-            entityName: 'EntityStub'
-        );
+        $this->httpClientMock = $this->createMock(ClientInterface::class);
         $userFieldsMetadata = new FieldsSettings('id');
         $userFieldsMetadata->addAllCasesDataFieldMap('id', 'data.id');
         $userFieldsMetadata->addAllCasesDataFieldMap('name', 'data.name');
@@ -250,7 +201,7 @@ class EntityManagerTest extends TestCase
         $userMetadata = new EntityMetadata(
             entityClassName: UserEntityStub::class,
             fieldsSettings: $userFieldsMetadata,
-            client: $client,
+            client: $this->httpClientMock,
             proxyClassName: UserEntityProxyStub::class
         );
 
@@ -268,7 +219,7 @@ class EntityManagerTest extends TestCase
         $dealMetadata = new EntityMetadata(
             entityClassName: DealEntityStub::class,
             fieldsSettings: $dealFieldsMetadata,
-            client: $client,
+            client: $this->httpClientMock,
             proxyClassName: DealEntityProxyStub::class,
             callbacksSettings: $callbackSetting
         );
