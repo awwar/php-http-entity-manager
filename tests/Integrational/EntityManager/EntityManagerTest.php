@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Tests\Acceptance;
+namespace Awwar\PhpHttpEntityManager\Tests\Integrational\EntityManager;
 
 use Awwar\PhpHttpEntityManager\Client\ClientInterface;
 use Awwar\PhpHttpEntityManager\Collection\GeneralCollection;

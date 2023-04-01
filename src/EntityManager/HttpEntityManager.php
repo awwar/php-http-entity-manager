@@ -212,6 +212,12 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
     {
         $suit = $this->entityAtelier->suitUpEntity($object);
 
-        $this->unitOfWork->delete($suit);
+        $actualSuit = $this->unitOfWork->getFromIdentity($suit);
+
+        if ($actualSuit->isNew()) {
+            throw new LogicException('Unable to remove new entity');
+        }
+
+        $this->unitOfWork->delete($actualSuit);
     }
 }
