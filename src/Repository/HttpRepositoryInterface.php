@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http;
+namespace Awwar\PhpHttpEntityManager\Repository;
 
 use Generator;
 

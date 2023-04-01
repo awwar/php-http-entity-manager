@@ -2,10 +2,10 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
-use Awwar\PhpHttpEntityManager\EntityManipulations\Create;
-use Awwar\PhpHttpEntityManager\EntityManipulations\Delete;
-use Awwar\PhpHttpEntityManager\EntityManipulations\Update;
 use Awwar\PhpHttpEntityManager\Exception\IdentityNotFoundException;
+use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Create;
+use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Delete;
+use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Update;
 use Exception;
 
 class HttpUnitOfWork implements HttpUnitOfWorkInterface
@@ -142,13 +142,13 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
             return;
         }
 
-        $newSuit = $this->getFromIdentity($suit);
+        $identitySuit = $this->getFromIdentity($suit);
 
-        if (false === $newSuit->isNew()) {
-            unset($this->keyToSplIdMap[$newSuit->getUniqueId()]);
+        if (false === $identitySuit->isNew()) {
+            unset($this->keyToSplIdMap[$identitySuit->getUniqueId()]);
         }
 
-        unset($this->identityMap[$newSuit->getSPLId()]);
+        unset($this->identityMap[$identitySuit->getSPLId()]);
     }
 
     /**

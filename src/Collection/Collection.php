@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http\Collection;
+namespace Awwar\PhpHttpEntityManager\Collection;
 
 use ArrayAccess;
 use Countable;

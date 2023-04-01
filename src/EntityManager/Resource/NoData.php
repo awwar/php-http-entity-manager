@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http\Resource;
+namespace Awwar\PhpHttpEntityManager\EntityManager\Resource;
 
 class NoData
 {

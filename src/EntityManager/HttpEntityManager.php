@@ -1,13 +1,16 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http;
+namespace Awwar\PhpHttpEntityManager\EntityManager;
 
+use Awwar\PhpHttpEntityManager\EntityManager\ListIterator\Data;
+use Awwar\PhpHttpEntityManager\EntityManager\Resource\FullData;
+use Awwar\PhpHttpEntityManager\EntityManager\Resource\NoData;
+use Awwar\PhpHttpEntityManager\EntityManager\Resource\Reference;
 use Awwar\PhpHttpEntityManager\Exception\NotFoundException;
-use Awwar\PhpHttpEntityManager\Http\ListIterator\Data;
-use Awwar\PhpHttpEntityManager\Http\Resource\FullData;
-use Awwar\PhpHttpEntityManager\Http\Resource\NoData;
-use Awwar\PhpHttpEntityManager\Http\Resource\Reference;
+use Awwar\PhpHttpEntityManager\Repository\HttpRepository;
+use Awwar\PhpHttpEntityManager\Repository\HttpRepositoryInterface;
 use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
+use Awwar\PhpHttpEntityManager\UOW\EntityCreatorInterface;
 use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWorkInterface;
 use Generator;
 use LogicException;

@@ -1,7 +1,8 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http\Collection;
+namespace Awwar\PhpHttpEntityManager\Proxy;
 
+use Awwar\PhpHttpEntityManager\Collection\Collection;
 use Closure;
 use Traversable;
 

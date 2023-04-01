@@ -2,9 +2,8 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
+use Awwar\PhpHttpEntityManager\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\DataStructure\SmartMap;
-use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
-use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use Closure;

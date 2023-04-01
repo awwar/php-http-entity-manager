@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\EntityManipulations;
+namespace Awwar\PhpHttpEntityManager\UOW\EntityManipulations;
 
 use Awwar\PhpHttpEntityManager\UOW\SuitedUpEntity;
 

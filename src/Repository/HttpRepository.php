@@ -1,7 +1,8 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http;
+namespace Awwar\PhpHttpEntityManager\Repository;
 
+use Awwar\PhpHttpEntityManager\EntityManager\HttpEntityManagerInterface;
 use Generator;
 
 class HttpRepository implements HttpRepositoryInterface

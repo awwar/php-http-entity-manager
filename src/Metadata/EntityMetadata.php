@@ -3,8 +3,8 @@
 namespace Awwar\PhpHttpEntityManager\Metadata;
 
 use Awwar\PhpHttpEntityManager\Client\ClientInterface;
-use Awwar\PhpHttpEntityManager\Http\HttpRepositoryInterface;
 use Awwar\PhpHttpEntityManager\Proxy\EmptyProxy;
+use Awwar\PhpHttpEntityManager\Repository\HttpRepositoryInterface;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;

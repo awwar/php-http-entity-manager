@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\Http;
+namespace Awwar\PhpHttpEntityManager\UOW;
 
 interface EntityCreatorInterface
 {
