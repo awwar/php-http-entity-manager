@@ -2,9 +2,9 @@
 
 namespace Awwar\PhpHttpEntityManager\UOW;
 
+use Awwar\PhpHttpEntityManager\DataStructure\SmartMap;
 use Awwar\PhpHttpEntityManager\Http\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\Http\EntityCreatorInterface;
-use Awwar\PhpHttpEntityManager\DataStructure\SmartMap;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use Closure;
@@ -312,6 +312,15 @@ class SuitedUpEntity
         }
 
         return $this->getValue($this->original, '__initialized');
+    }
+
+    public function markProxyAsInitialized(): void
+    {
+        if (!$this->isProxy()) {
+            throw new \RuntimeException('This suit is not a proxy!');
+        }
+
+        $this->setValue($this->original, '__initialized', true);
     }
 
     public function proxy(Closure $managerCallback, mixed $id = null): void

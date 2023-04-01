@@ -35,26 +35,53 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
     public function createEntityWithData(string $className, mixed $data): ?object
     {
+        #             createEntityWithData
+        #              /                \
+        #          FullData         Reference
+        #             |                  |
+        #      exist in IDMap?     exist in IDMap?
+        #         /        |           |       \
+        #       yes        no         yes      no
+        #        |         |           |       |
+        #        |     create and      |     proxy +
+        #        |     fill + add       |   add to IdMap
+        #        |     to IdMap        |
+        #    is proxy?              just return
+        #    /      \
+        #   yes     no
+        #    |       |
+        # fill and    |
+        # return     |
+        #        just return
+        if ($data instanceof NoData) {
+            return null;
+        }
+
         $suit = $this->entityAtelier->suitUpClass($className);
 
         if ($data instanceof FullData) {
             $suit->setIdAfterRead($data->getData());
+
+            if ($this->unitOfWork->hasSuit($suit)) {
+                $suitFromIdentity = $this->unitOfWork->getFromIdentity($suit);
+
+                if ($suitFromIdentity->isProxy()) {
+                    $suitFromIdentity->markProxyAsInitialized();
+                    $suitFromIdentity->callAfterRead($data->getData(), $this);
+                }
+            } else {
+                $suit->callAfterRead($data->getData(), $this);
+                $this->unitOfWork->commit($suit, false);
+            }
         } elseif ($data instanceof Reference) {
-            $suit->proxy(fn ($obj) => $this->refresh($obj), $data->getId());
-        } elseif ($data instanceof NoData) {
-            return null;
+            $suit->setId($data->getId());
+
+            if (false === $this->unitOfWork->hasSuit($suit)) {
+                $suit->proxy(fn ($obj) => $this->refresh($obj), $data->getId());
+                $this->unitOfWork->commit($suit, false);
+            }
         } else {
             throw new LogicException("Unable to map relation - invalid data type!");
-        }
-
-        if (false === $this->unitOfWork->hasSuit($suit)) {
-            $this->unitOfWork->commit($suit, false);
-
-            if ($data instanceof FullData) {
-                $suit->callAfterRead($data->getData(), $this);
-
-                $this->unitOfWork->upgrade($suit);
-            }
         }
 
         return $this->unitOfWork->getFromIdentity($suit)->getOriginal();

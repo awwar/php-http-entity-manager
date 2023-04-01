@@ -300,7 +300,7 @@ class EntityManagerTest extends TestCase
         $deal = $this->entityManager->find(DealEntityStub::class, 11);
 
         // Proxy admin
-        self::assertInstanceOf(UserEntityStub::class, $deal->admin);
+        self::assertInstanceOf(UserEntityProxyStub::class, $deal->admin);
         self::assertSame(15, $deal->admin->id);
         self::assertSame('Piter', $deal->admin->name);
 
