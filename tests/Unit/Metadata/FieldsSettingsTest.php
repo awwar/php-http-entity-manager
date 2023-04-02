@@ -2,7 +2,6 @@
 
 namespace Awwar\PhpHttpEntityManager\Tests\Unit\Metadata;
 
-use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 use Awwar\PhpHttpEntityManager\Metadata\FieldsSettings;
 use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +13,7 @@ class FieldsSettingsTest extends TestCase
         $key6Setting = new RelationSettings(
             'some_class',
             'some_class_relation',
-            RelationExpectsEnum::ONE
+            RelationSettings::ONE
         );
 
         $fieldsSettings = new FieldsSettings('id');

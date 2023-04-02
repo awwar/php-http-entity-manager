@@ -2,9 +2,9 @@
 
 namespace Awwar\PhpHttpEntityManager\Tests\Stubs;
 
-use Awwar\PhpHttpEntityManager\Collection\Collection;
-use Awwar\PhpHttpEntityManager\EntityManager\Resource\FullData;
-use Awwar\PhpHttpEntityManager\EntityManager\Resource\Reference;
+use Awwar\PhpHttpEntityManager\Collection\CollectionInterface;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\FullData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\Reference;
 
 class DealEntityStub
 {
@@ -12,7 +12,7 @@ class DealEntityStub
     public int $amount = 0;
     public UserEntityStub $user;
     public ?UserEntityStub $admin = null;
-    public Collection $invoices;
+    public CollectionInterface $invoices;
 
     private function mapper(array &$data, string $name): iterable
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\UnitOfWork;
 
 interface HttpUnitOfWorkInterface
 {
@@ -10,7 +10,7 @@ interface HttpUnitOfWorkInterface
 
     public function delete(SuitedUpEntity $suit): void;
 
-    public function flush(): void;
+    public function calculateChanges(): ChangesCollection;
 
     public function getFromIdentity(SuitedUpEntity $suit): SuitedUpEntity;
 

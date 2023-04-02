@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\EntityManager\Resource;
+namespace Awwar\PhpHttpEntityManager\EntityManager\RelationUnit;
 
 class Reference
 {

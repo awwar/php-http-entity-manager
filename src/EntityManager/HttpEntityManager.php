@@ -2,16 +2,16 @@
 
 namespace Awwar\PhpHttpEntityManager\EntityManager;
 
-use Awwar\PhpHttpEntityManager\EntityManager\ListIterator\Data;
-use Awwar\PhpHttpEntityManager\EntityManager\Resource\FullData;
-use Awwar\PhpHttpEntityManager\EntityManager\Resource\NoData;
-use Awwar\PhpHttpEntityManager\EntityManager\Resource\Reference;
+use Awwar\PhpHttpEntityManager\EntityManager\ListUnit\Item;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\FullData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\NoData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\Reference;
 use Awwar\PhpHttpEntityManager\Exception\NotFoundException;
 use Awwar\PhpHttpEntityManager\Repository\HttpRepository;
 use Awwar\PhpHttpEntityManager\Repository\HttpRepositoryInterface;
-use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
-use Awwar\PhpHttpEntityManager\UOW\EntityCreatorInterface;
-use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWorkInterface;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityAtelier;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityCreatorInterface;
+use Awwar\PhpHttpEntityManager\UnitOfWork\HttpUnitOfWorkInterface;
 use Generator;
 use LogicException;
 use RuntimeException;
@@ -119,7 +119,13 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
     public function flush(): void
     {
-        $this->unitOfWork->flush();
+        $changeCollection = $this->unitOfWork->calculateChanges();
+
+        foreach ($changeCollection->getAll() as $change) {
+            $change->execute();
+
+            $this->unitOfWork->upgrade($change->getSuit());
+        }
     }
 
     public function getRepository(string $className): HttpRepositoryInterface
@@ -149,13 +155,13 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         $firstIteration = true;
 
         do {
-            $signal = $iterator->current();
+            $item = $iterator->current();
 
-            if ($signal instanceof Data) {
-                $nextUrl = $signal->getUrl();
+            if ($item instanceof Item) {
+                $nextUrl = $item->getNextPageUrl();
             }
 
-            if ($signal === null) {
+            if ($item === null) {
                 if ($nextUrl === null) {
                     if ($firstIteration === true && $isFilterOne === true) {
                         throw new NotFoundException(entity: $metadata->getName());
@@ -171,7 +177,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
             $firstIteration = false;
 
             $newSuit = $this->entityAtelier->suitUpClass($className);
-            $newSuit->callAfterRead($signal->getData(), $this);
+            $newSuit->callAfterRead($item->getData(), $this);
 
             $this->unitOfWork->commit($newSuit);
 

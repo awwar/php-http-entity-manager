@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\UnitOfWork;
 
 use Awwar\PhpHttpEntityManager\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\DataStructure\SmartMap;
@@ -8,6 +8,7 @@ use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\RelationSettings;
 use Closure;
 use Exception;
+use RuntimeException;
 use Throwable;
 
 class SuitedUpEntity
@@ -316,7 +317,7 @@ class SuitedUpEntity
     public function markProxyAsInitialized(): void
     {
         if (!$this->isProxy()) {
-            throw new \RuntimeException('This suit is not a proxy!');
+            throw new RuntimeException('This suit is not a proxy!');
         }
 
         $this->setValue($this->original, '__initialized', true);

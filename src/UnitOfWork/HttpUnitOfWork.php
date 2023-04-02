@@ -1,11 +1,11 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\UnitOfWork;
 
 use Awwar\PhpHttpEntityManager\Exception\IdentityNotFoundException;
-use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Create;
-use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Delete;
-use Awwar\PhpHttpEntityManager\UOW\EntityManipulations\Update;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityManipulations\Create;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityManipulations\Delete;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityManipulations\Update;
 use Exception;
 
 class HttpUnitOfWork implements HttpUnitOfWorkInterface
@@ -67,17 +67,15 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
      * @throws IdentityNotFoundException
      * @throws Exception
      */
-    public function flush(): void
+    public function calculateChanges(): ChangesCollection
     {
-        $forCreate = [];
-        $forDelete = [];
-        $forUpdate = [];
+        $changesCollection = new ChangesCollection();
 
         foreach ($this->identityMap as $splId => $suit) {
             if ($suit->isDeleted()) {
-                $forDelete[$splId] = new Delete($suit);
+                $changesCollection->addDelete($splId, new Delete($suit));
             } elseif ($suit->isNew()) {
-                $forCreate[$splId] = new Create($suit);
+                $changesCollection->addCreate($splId, new Create($suit));
             } else {
                 if (false === $suit->isProxyInitialized()) {
                     continue;
@@ -100,19 +98,11 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
                     }
                 }
 
-                $forUpdate[$splId] = new Update($suit, $scalarChanges, $relationChanges);
+                $changesCollection->addUpdate($splId, new Update($suit, $scalarChanges, $relationChanges));
             }
         }
 
-        $manipulations = array_merge($forCreate, $forUpdate, $forDelete);
-
-        foreach ($manipulations as $manipulation) {
-            $manipulation->execute();
-
-            $suit = $manipulation->getSuit();
-
-            $this->upgrade($suit);
-        }
+        return $changesCollection;
     }
 
     /**

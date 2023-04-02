@@ -2,59 +2,59 @@
 
 namespace Awwar\PhpHttpEntityManager\Proxy;
 
-use Awwar\PhpHttpEntityManager\Collection\Collection;
+use Awwar\PhpHttpEntityManager\Collection\GeneralCollection;
 use Closure;
 use Traversable;
 
-class ProxyCollection implements Collection
+class ProxyCollection extends GeneralCollection
 {
-    private array $collection = [];
-
     private bool $isInitialized = false;
 
-    public function __construct(private Closure $initiator)
+    public function __construct(private Closure $initiator, array $collection = [])
     {
+        parent::__construct($collection);
     }
 
     public function count(): int
     {
         $this->tryInit();
 
-        return count($this->collection);
+        return parent::count();
     }
 
     public function getIterator(): Traversable
     {
         $this->tryInit();
-        foreach ($this->collection as $item) {
-            yield $item;
-        }
+
+        return parent::getIterator();
     }
 
     public function offsetExists($offset): bool
     {
         $this->tryInit();
 
-        return isset($this->collection[$offset]);
+        return parent::offsetExists($offset);
     }
 
     public function offsetGet($offset): mixed
     {
         $this->tryInit();
 
-        return $this->collection[$offset];
+        return parent::offsetGet($offset);
     }
 
     public function offsetSet($offset, $value): void
     {
         $this->tryInit();
-        $this->collection[$offset] = $value;
+
+        parent::offsetSet($offset, $value);
     }
 
     public function offsetUnset($offset): void
     {
         $this->tryInit();
-        unset($this->collection[$offset]);
+
+        parent::offsetUnset($offset);
     }
 
     private function tryInit(): void
@@ -62,8 +62,8 @@ class ProxyCollection implements Collection
         if ($this->isInitialized === false) {
             $iterator = $this->initiator->call($this);
 
-            foreach ($iterator as $item) {
-                $this->collection[] = $item;
+            foreach ($iterator as $i => $item) {
+                $this->collection[$i] = $item;
             }
 
             $this->isInitialized = true;

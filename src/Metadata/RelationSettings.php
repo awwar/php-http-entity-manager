@@ -2,11 +2,19 @@
 
 namespace Awwar\PhpHttpEntityManager\Metadata;
 
-use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 use InvalidArgumentException;
 
 class RelationSettings
 {
+    public const ALL = [
+        self::ONE,
+        self::MANY,
+    ];
+
+    public const ONE = 0;
+
+    public const MANY = 1;
+
     private bool $isCollection;
 
     public function __construct(
@@ -14,11 +22,11 @@ class RelationSettings
         private string $name,
         int $expects
     ) {
-        if (in_array($expects, RelationExpectsEnum::ALL) === false) {
+        if (in_array($expects, self::ALL) === false) {
             throw new InvalidArgumentException('Relation expectation must be only "many", "one"');
         }
 
-        $this->isCollection = $expects === RelationExpectsEnum::MANY;
+        $this->isCollection = $expects === self::MANY;
     }
 
     public function getClass(): string

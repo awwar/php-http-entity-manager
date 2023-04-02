@@ -1,8 +1,8 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW\EntityManipulations;
+namespace Awwar\PhpHttpEntityManager\UnitOfWork\EntityManipulations;
 
-use Awwar\PhpHttpEntityManager\UOW\SuitedUpEntity;
+use Awwar\PhpHttpEntityManager\UnitOfWork\SuitedUpEntity;
 
 class Update implements ManipulationCommandInterface
 {

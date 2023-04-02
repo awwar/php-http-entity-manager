@@ -1,6 +1,6 @@
 <?php
 
-namespace Awwar\PhpHttpEntityManager\UOW;
+namespace Awwar\PhpHttpEntityManager\UnitOfWork;
 
 use Awwar\PhpHttpEntityManager\Metadata\MetadataRegistryInterface;
 

@@ -5,7 +5,6 @@ namespace Awwar\PhpHttpEntityManager\Tests\Integrational\EntityManager;
 use Awwar\PhpHttpEntityManager\Client\ClientInterface;
 use Awwar\PhpHttpEntityManager\Collection\GeneralCollection;
 use Awwar\PhpHttpEntityManager\EntityManager\HttpEntityManager;
-use Awwar\PhpHttpEntityManager\Enum\RelationExpectsEnum;
 use Awwar\PhpHttpEntityManager\Metadata\CallbacksSettings;
 use Awwar\PhpHttpEntityManager\Metadata\EntityMetadata;
 use Awwar\PhpHttpEntityManager\Metadata\FieldsSettings;
@@ -17,8 +16,8 @@ use Awwar\PhpHttpEntityManager\Tests\Stubs\InvoiceEntityProxyStub;
 use Awwar\PhpHttpEntityManager\Tests\Stubs\InvoiceEntityStub;
 use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityProxyStub;
 use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityStub;
-use Awwar\PhpHttpEntityManager\UOW\EntityAtelier;
-use Awwar\PhpHttpEntityManager\UOW\HttpUnitOfWork;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityAtelier;
+use Awwar\PhpHttpEntityManager\UnitOfWork\HttpUnitOfWork;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -422,17 +421,17 @@ class EntityManagerTest extends TestCase
         $dealFieldsMetadata->addRelationField('user', new RelationSettings(
             class: UserEntityStub::class,
             name: 'user',
-            expects: RelationExpectsEnum::ONE
+            expects: RelationSettings::ONE
         ));
         $dealFieldsMetadata->addRelationField('admin', new RelationSettings(
             class: UserEntityStub::class,
             name: 'admin',
-            expects: RelationExpectsEnum::ONE
+            expects: RelationSettings::ONE
         ));
         $dealFieldsMetadata->addRelationField('invoices', new RelationSettings(
             class: InvoiceEntityStub::class,
             name: 'invoices',
-            expects: RelationExpectsEnum::MANY
+            expects: RelationSettings::MANY
         ));
 
         $callbackSetting = new CallbacksSettings(relationMapperMethod: 'mapper');

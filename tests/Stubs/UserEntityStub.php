@@ -9,6 +9,16 @@ class UserEntityStub
     public int $id;
     public string $name = '';
 
+    public static function create(int $id, string $name): self
+    {
+        $self = new self();
+
+        $self->id = $id;
+        $self->name = $name;
+
+        return $self;
+    }
+
     public function relationMapper(self $self): array
     {
         return [$this->name . '-relation'];
