@@ -49,11 +49,11 @@ class EntityMetadata
             ->newInstanceWithoutConstructor();
 
         if ($filterSettings === null) {
-            $this->filterSettings = new FilterSettings();
+            $filterSettings = new FilterSettings();
         }
 
         if ($urlSettings === null) {
-            $this->urlSettings = new UrlSettings(
+            $urlSettings = new UrlSettings(
                 one: "/api/$this->name/{id}/",
                 list: "/api/$this->name/",
                 create: "/api/$this->name/",
@@ -67,6 +67,8 @@ class EntityMetadata
         }
 
         $this->callbacksSettings = $callbacksSettings;
+        $this->filterSettings = $filterSettings;
+        $this->urlSettings = $urlSettings;
     }
 
     public function getClassName(): string
