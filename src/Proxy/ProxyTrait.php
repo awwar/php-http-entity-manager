@@ -50,12 +50,12 @@ trait ProxyTrait
     {
         $parentClass = get_parent_class($this);
 
-        $unsetter = Closure::bind(function (object $parent, string $name) {
+        $unsetCallback = Closure::bind(function (object $parent, string $name) {
             unset($parent->$name);
         }, null, $parentClass);
 
         foreach ($properties as $property) {
-            $unsetter($this, $property);
+            $unsetCallback($this, $property);
         }
 
         $this->__id = $idProperty;
