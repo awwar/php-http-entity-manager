@@ -33,11 +33,6 @@ class GeneralCollection implements CollectionInterface
         return $this->collection[$offset];
     }
 
-    public function offsetSet($offset, $value): void
-    {
-        $this->collection[$offset] = $value;
-    }
-
     public function offsetUnset($offset): void
     {
         unset($this->collection[$offset]);
@@ -50,6 +45,7 @@ class GeneralCollection implements CollectionInterface
         foreach ($this->collection as $key => $value) {
             $result [] = call_user_func($callback, $key, $value);
         }
+
         return $result;
     }
 
@@ -73,6 +69,11 @@ class GeneralCollection implements CollectionInterface
         }
 
         return $self;
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        $this->collection[$offset] = $value;
     }
 
     public function each(Closure $callback): void

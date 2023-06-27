@@ -90,6 +90,21 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         return $this->unitOfWork->getFromIdentity($suit)->getOriginal();
     }
 
+    public function refresh(object $object): void
+    {
+        $suit = $this->entityAtelier->suitUpEntity($object);
+
+        $suit = $this->unitOfWork->getFromIdentity($suit);
+        $metadata = $suit->getMetadata();
+
+        $data = $metadata->getClient()->get(
+            $metadata->getUrlForOne($suit->getId()),
+            $metadata->getGetOneQuery()
+        );
+
+        $suit->callAfterRead($data, $this);
+    }
+
     public function detach(object $object): void
     {
         $suit = $this->entityAtelier->suitUpEntity($object);
@@ -197,21 +212,6 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         $suit = $this->entityAtelier->suitUpEntity($object);
 
         $this->unitOfWork->commit($suit);
-    }
-
-    public function refresh(object $object): void
-    {
-        $suit = $this->entityAtelier->suitUpEntity($object);
-
-        $suit = $this->unitOfWork->getFromIdentity($suit);
-        $metadata = $suit->getMetadata();
-
-        $data = $metadata->getClient()->get(
-            $metadata->getUrlForOne($suit->getId()),
-            $metadata->getGetOneQuery()
-        );
-
-        $suit->callAfterRead($data, $this);
     }
 
     public function remove(object $object): void

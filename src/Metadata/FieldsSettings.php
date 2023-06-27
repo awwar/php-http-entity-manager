@@ -36,24 +36,17 @@ class FieldsSettings
     {
     }
 
+    public function addAllCasesDataFieldMap(string $fieldName, ?string $path): void
+    {
+        $this->addOnRequestDataFieldMap($fieldName, $path);
+        $this->addOnResponseDataFieldMap($fieldName, $path);
+    }
+
     public function addOnRequestDataFieldMap(string $fieldName, ?string $path): void
     {
         foreach (self::REQUEST_CONDITIONS as $condition) {
             $this->addDataFieldMap($condition, $fieldName, $path);
         }
-    }
-
-    public function addOnResponseDataFieldMap(string $fieldName, ?string $path): void
-    {
-        foreach (self::RESPONSE_CONDITIONS as $condition) {
-            $this->addDataFieldMap($condition, $fieldName, $path);
-        }
-    }
-
-    public function addAllCasesDataFieldMap(string $fieldName, ?string $path): void
-    {
-        $this->addOnRequestDataFieldMap($fieldName, $path);
-        $this->addOnResponseDataFieldMap($fieldName, $path);
     }
 
     public function addDataFieldMap(string $condition, string $fieldName, ?string $path): void
@@ -82,6 +75,13 @@ class FieldsSettings
         }
 
         $this->dataFieldsSettings[$condition][$fieldName] = $path;
+    }
+
+    public function addOnResponseDataFieldMap(string $fieldName, ?string $path): void
+    {
+        foreach (self::RESPONSE_CONDITIONS as $condition) {
+            $this->addDataFieldMap($condition, $fieldName, $path);
+        }
     }
 
     public function addDefaultValue(string $fieldName, mixed $value): void

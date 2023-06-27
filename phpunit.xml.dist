@@ -4,7 +4,6 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
 >
     <php>
         <ini name="error_reporting" value="-1" />

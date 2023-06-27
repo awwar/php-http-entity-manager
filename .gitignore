@@ -4,4 +4,3 @@ vendor
 /var
 .DS_Store
 /.cache-phpcs
-/composer.lock

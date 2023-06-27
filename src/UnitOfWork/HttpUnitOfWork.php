@@ -31,6 +31,42 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
     }
 
+    public function remove(SuitedUpEntity $suit): void
+    {
+        if (false === $this->hasSuit($suit)) {
+            return;
+        }
+
+        $identitySuit = $this->getFromIdentity($suit);
+
+        if (false === $identitySuit->isNew()) {
+            unset($this->keyToSplIdMap[$identitySuit->getUniqueId()]);
+        }
+
+        unset($this->identityMap[$identitySuit->getSPLId()]);
+    }
+
+    public function hasSuit(SuitedUpEntity $suit): bool
+    {
+        return $suit->isNew()
+            ? isset($this->identityMap[$suit->getSPLId()])
+            : isset($this->keyToSplIdMap[$suit->getUniqueId()]);
+    }
+
+    /**
+     * @throws IdentityNotFoundException
+     */
+    public function getFromIdentity(SuitedUpEntity $suit): SuitedUpEntity
+    {
+        if (false === $this->hasSuit($suit)) {
+            throw IdentityNotFoundException::create($suit->getClass(), $suit->getId());
+        }
+
+        $splId = $suit->isNew() ? $suit->getSPLId() : $this->keyToSplIdMap[$suit->getUniqueId()];
+
+        return $this->identityMap[$splId];
+    }
+
     public function commit(SuitedUpEntity $suit, bool $withWatch = true): void
     {
         if ($this->hasSuit($suit)) {
@@ -103,42 +139,6 @@ class HttpUnitOfWork implements HttpUnitOfWorkInterface
         }
 
         return $changesCollection;
-    }
-
-    /**
-     * @throws IdentityNotFoundException
-     */
-    public function getFromIdentity(SuitedUpEntity $suit): SuitedUpEntity
-    {
-        if (false === $this->hasSuit($suit)) {
-            throw IdentityNotFoundException::create($suit->getClass(), $suit->getId());
-        }
-
-        $splId = $suit->isNew() ? $suit->getSPLId() : $this->keyToSplIdMap[$suit->getUniqueId()];
-
-        return $this->identityMap[$splId];
-    }
-
-    public function hasSuit(SuitedUpEntity $suit): bool
-    {
-        return $suit->isNew()
-            ? isset($this->identityMap[$suit->getSPLId()])
-            : isset($this->keyToSplIdMap[$suit->getUniqueId()]);
-    }
-
-    public function remove(SuitedUpEntity $suit): void
-    {
-        if (false === $this->hasSuit($suit)) {
-            return;
-        }
-
-        $identitySuit = $this->getFromIdentity($suit);
-
-        if (false === $identitySuit->isNew()) {
-            unset($this->keyToSplIdMap[$identitySuit->getUniqueId()]);
-        }
-
-        unset($this->identityMap[$identitySuit->getSPLId()]);
     }
 
     /**
