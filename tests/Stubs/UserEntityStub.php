@@ -2,6 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\Tests\Stubs;
 
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityChangesDTO;
 use Traversable;
 
 class UserEntityStub
@@ -19,22 +20,22 @@ class UserEntityStub
         return $self;
     }
 
-    public function relationMapper(self $self): array
+    public function relationMappingCallback(): array
     {
         return [$this->name . '-relation'];
     }
 
-    public function updateLayout(self $self): array
+    public function updateRequestLayoutCallback(EntityChangesDTO $changesDTO): array
     {
         return [$this->name . '-update'];
     }
 
-    public function createLayout(self $self): array
+    public function createRequestLayoutCallback(EntityChangesDTO $changesDTO): array
     {
         return [$this->name . '-create'];
     }
 
-    public function listDetermination(array $data): Traversable
+    public function listMappingCallback(array $data): Traversable
     {
         foreach ($data as $value) {
             yield $this->name . '-' . $value;

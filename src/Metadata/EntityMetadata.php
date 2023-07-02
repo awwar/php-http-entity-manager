@@ -81,12 +81,12 @@ class EntityMetadata
         return $this->client;
     }
 
-    public function getCreateLayout(): callable
+    public function getCreateRequestLayoutCallback(object $entity): callable
     {
         return $this
                 ->callbacksSettings
-                ->getCreateLayout()
-                ->bindTo($this->emptyInstance, $this->emptyInstance)
+                ->getCreateRequestLayoutCallback()
+                ->bindTo($entity, $entity)
             ?? throw new RuntimeException('Unable to binding callback');
     }
 
@@ -111,19 +111,19 @@ class EntityMetadata
         return $this->fieldsSettings->getDataFieldsSettings()[$name] ?? [];
     }
 
-    public function getFilterOneQuery(): array
+    public function getOnFindOneQueryMixin(): array
     {
-        return $this->filterSettings->getFilterOneQuery();
+        return $this->filterSettings->getOnFindOneQueryMixin();
     }
 
-    public function getFilterQuery(): array
+    public function getOnFilterQueryMixin(): array
     {
-        return $this->filterSettings->getFilterQuery();
+        return $this->filterSettings->getOnFilterQueryMixin();
     }
 
-    public function getGetOneQuery(): array
+    public function getOnGetOneQueryMixin(): array
     {
-        return $this->filterSettings->getGetOneQuery();
+        return $this->filterSettings->getOnGetOneQueryMixin();
     }
 
     public function getIdProperty(): string
@@ -131,11 +131,11 @@ class EntityMetadata
         return $this->fieldsSettings->getIdProperty();
     }
 
-    public function getListDetermination(): callable
+    public function getListMappingCallback(): callable
     {
         return $this
                 ->callbacksSettings
-                ->getListDetermination()
+                ->getListMappingCallback()
                 ->bindTo($this->emptyInstance, $this->emptyInstance)
             ?? throw new RuntimeException('Unable to binding callback');
     }
@@ -160,12 +160,12 @@ class EntityMetadata
         return get_class($this->proxy);
     }
 
-    public function getRelationsMapper(): callable
+    public function getRelationsMapper(object $entity): callable
     {
         return $this
                 ->callbacksSettings
-                ->getRelationMapper()
-                ->bindTo($this->emptyInstance, $this->emptyInstance)
+                ->getRelationMappingCallback()
+                ->bindTo($entity, $entity)
             ?? throw new RuntimeException('Unable to binding callback');
     }
 
@@ -187,12 +187,12 @@ class EntityMetadata
         return $this->fieldsSettings->getScalarProperties();
     }
 
-    public function getUpdateLayout(): callable
+    public function getUpdateRequestLayoutCallback(object $entity): callable
     {
         return $this
                 ->callbacksSettings
-                ->getUpdateLayout()
-                ->bindTo($this->emptyInstance, $this->emptyInstance)
+                ->getUpdateRequestLayoutCallback()
+                ->bindTo($entity, $entity)
             ?? throw new RuntimeException('Unable to binding callback');
     }
 

@@ -99,7 +99,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
         $data = $metadata->getClient()->get(
             $metadata->getUrlForOne($suit->getId()),
-            $metadata->getGetOneQuery()
+            $metadata->getOnGetOneQueryMixin()
         );
 
         $suit->callAfterRead($data, $this);
@@ -120,7 +120,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         if (false === $this->unitOfWork->hasSuit($suit)) {
             $metadata = $suit->getMetadata();
 
-            $newCriteria = array_merge($metadata->getGetOneQuery(), $criteria);
+            $newCriteria = array_merge($metadata->getOnGetOneQueryMixin(), $criteria);
 
             $data = $metadata->getClient()->get($metadata->getUrlForOne($id), $newCriteria);
 
@@ -159,11 +159,11 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         $suit = $this->entityAtelier->suitUpClass($className);
         $metadata = $suit->getMetadata();
 
-        $criteria = array_merge($isFilterOne ? $metadata->getFilterOneQuery() : $metadata->getFilterQuery(), $criteria);
+        $criteria = array_merge($isFilterOne ? $metadata->getOnFindOneQueryMixin() : $metadata->getOnFilterQueryMixin(), $criteria);
 
         $data = $metadata->getClient()->get($url === null ? $metadata->getUrlForList() : $url, $criteria);
 
-        $iterator = $metadata->getListDetermination()($data);
+        $iterator = $metadata->getListMappingCallback()($data);
 
         $nextUrl = null;
 
@@ -185,7 +185,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
                 }
                 $data = $metadata->getClient()->get($nextUrl, $criteria);
 
-                $iterator = $metadata->getListDetermination()($data);
+                $iterator = $metadata->getListMappingCallback()($data);
                 $nextUrl = null;
                 continue;
             }

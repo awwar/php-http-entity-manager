@@ -4,6 +4,7 @@ namespace Awwar\PhpHttpEntityManager\Tests\Unit\Metadata;
 
 use Awwar\PhpHttpEntityManager\Metadata\CallbacksSettings;
 use Awwar\PhpHttpEntityManager\Tests\Stubs\UserEntityStub;
+use Awwar\PhpHttpEntityManager\UnitOfWork\EntityChangesDTO;
 use PHPUnit\Framework\TestCase;
 
 class CallbacksSettingsTest extends TestCase
@@ -15,29 +16,33 @@ class CallbacksSettingsTest extends TestCase
         $userEntity->id = 2;
         $userEntity->name = 'Jane';
 
-        self::assertSame([], $urlSettings->getRelationMapper()->call($userEntity, $userEntity));
-        self::assertSame([], $urlSettings->getUpdateLayout()->call($userEntity, $userEntity));
-        self::assertSame([], $urlSettings->getCreateLayout()->call($userEntity, $userEntity));
-        $generator = $urlSettings->getListDetermination()->call($userEntity, ['a', 'b']);
+        $changes = new EntityChangesDTO([], [], [], []);
+
+        self::assertSame([], $urlSettings->getRelationMappingCallback()->call($userEntity));
+        self::assertSame([], $urlSettings->getUpdateRequestLayoutCallback()->call($userEntity, $changes));
+        self::assertSame([], $urlSettings->getCreateRequestLayoutCallback()->call($userEntity, $changes));
+        $generator = $urlSettings->getListMappingCallback()->call($userEntity, ['a', 'b']);
         self::assertSame(['a', 'b'], iterator_to_array($generator));
     }
 
     public function testCreateWhenFilled(): void
     {
         $urlSettings = new CallbacksSettings(
-            relationMapperMethod: 'relationMapper',
-            createLayoutMethod: 'createLayout',
-            updateLayoutMethod: 'updateLayout',
-            listDeterminationMethod: 'listDetermination',
+            relationMappingCallbackMethod: 'relationMappingCallback',
+            createRequestLayoutCallbackMethod: 'createRequestLayoutCallback',
+            updateRequestLayoutCallbackMethod: 'updateRequestLayoutCallback',
+            listMappingCallbackMethod: 'listMappingCallback',
         );
         $userEntity = new UserEntityStub();
         $userEntity->id = 2;
         $userEntity->name = 'Jane';
 
-        self::assertSame(['Jane-relation'], $urlSettings->getRelationMapper()->call($userEntity, $userEntity));
-        self::assertSame(['Jane-update'], $urlSettings->getUpdateLayout()->call($userEntity, $userEntity));
-        self::assertSame(['Jane-create'], $urlSettings->getCreateLayout()->call($userEntity, $userEntity));
-        $generator = $urlSettings->getListDetermination()->call($userEntity, ['a', 'b']);
+        $changes = new EntityChangesDTO([], [], [], []);
+
+        self::assertSame(['Jane-relation'], $urlSettings->getRelationMappingCallback()->call($userEntity));
+        self::assertSame(['Jane-update'], $urlSettings->getUpdateRequestLayoutCallback()->call($userEntity, $changes));
+        self::assertSame(['Jane-create'], $urlSettings->getCreateRequestLayoutCallback()->call($userEntity, $changes));
+        $generator = $urlSettings->getListMappingCallback()->call($userEntity, ['a', 'b']);
         self::assertSame(['Jane-a', 'Jane-b'], iterator_to_array($generator));
     }
 }

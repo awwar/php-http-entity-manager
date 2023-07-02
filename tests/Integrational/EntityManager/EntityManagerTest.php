@@ -434,7 +434,7 @@ class EntityManagerTest extends TestCase
             expects: RelationSettings::MANY
         ));
 
-        $callbackSetting = new CallbacksSettings(relationMapperMethod: 'mapper');
+        $callbackSetting = new CallbacksSettings(relationMappingCallbackMethod: 'mapper');
 
         $dealMetadata = new EntityMetadata(
             entityClassName: DealEntityStub::class,

@@ -55,15 +55,17 @@ class SuitedUpEntity
     {
         $map = $this->entityMetadata->getFieldMap('beforeCreate');
 
-        $layout = $this->entityMetadata->getCreateLayout()(
-            $this->original,
-            [],
-            [],
-            $this->getScalarSnapshot(),
-            $this->getRelationValues(),
+        $changesDTO = new EntityChangesDTO(
+            entityChanges: [],
+            relationChanges: [],
+            entityData: $this->getScalarSnapshot(),
+            relationData: $this->getRelationValues()
         );
 
+        $layout = $this->entityMetadata->getCreateRequestLayoutCallback($this->original)($changesDTO);
+
         $smartMap = new SmartMap($layout);
+
         foreach ($map as $field => $path) {
             if (
                 $field === $this->getMetadata()->getIdProperty()
@@ -83,13 +85,15 @@ class SuitedUpEntity
         array $relationChanges,
     ): array {
         $map = $this->entityMetadata->getFieldMap('beforeUpdate');
-        $layout = $this->entityMetadata->getUpdateLayout()(
-            $this->original,
-            $entityChanges,
-            $relationChanges,
-            $this->getScalarSnapshot(),
-            $this->getRelationValues(),
+
+        $changesDTO = new EntityChangesDTO(
+            entityChanges: $entityChanges,
+            relationChanges: $relationChanges,
+            entityData: $this->getScalarSnapshot(),
+            relationData: $this->getRelationValues()
         );
+
+        $layout = $this->entityMetadata->getUpdateRequestLayoutCallback($this->original)($changesDTO);
 
         $smartMap = new SmartMap($layout);
 
@@ -462,7 +466,7 @@ class SuitedUpEntity
 
     private function mapNestedRelation(array $data, EntityCreatorInterface $creator): void
     {
-        $relationsMapper = $this->entityMetadata->getRelationsMapper();
+        $relationsMapper = $this->entityMetadata->getRelationsMapper($this->original);
         $relations = $this->entityMetadata->getRelationsMetadata();
 
         foreach ($relations as $field => $mapping) {

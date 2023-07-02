@@ -6,56 +6,56 @@ use Closure;
 
 class CallbacksSettings
 {
-    private Closure $createLayout;
+    private Closure $createRequestLayoutCallback;
 
-    private Closure $updateLayout;
+    private Closure $updateRequestLayoutCallback;
 
-    private Closure $relationMapper;
+    private Closure $relationMappingCallback;
 
-    private Closure $listDetermination;
+    private Closure $listMappingCallback;
 
     public function __construct(
-        ?string $relationMapperMethod = null,
-        ?string $createLayoutMethod = null,
-        ?string $updateLayoutMethod = null,
-        ?string $listDeterminationMethod = null,
+        ?string $relationMappingCallbackMethod = null,
+        ?string $createRequestLayoutCallbackMethod = null,
+        ?string $updateRequestLayoutCallbackMethod = null,
+        ?string $listMappingCallbackMethod = null,
     ) {
-        if ($methodName = $relationMapperMethod) {
-            $this->relationMapper = (function (...$payload) use ($methodName) {
+        if ($methodName = $relationMappingCallbackMethod) {
+            $this->relationMappingCallback = (function (...$payload) use ($methodName) {
                 return $this->{$methodName}(...$payload);
             });
         } else {
-            $this->relationMapper = function () {
+            $this->relationMappingCallback = function () {
                 return [];
             };
         }
 
-        if ($methodName = $createLayoutMethod) {
-            $this->createLayout = (function (...$payload) use ($methodName) {
+        if ($methodName = $createRequestLayoutCallbackMethod) {
+            $this->createRequestLayoutCallback = (function (...$payload) use ($methodName) {
                 return $this->{$methodName}(...$payload);
             });
         } else {
-            $this->createLayout = function () {
+            $this->createRequestLayoutCallback = function () {
                 return [];
             };
         }
 
-        if ($methodName = $updateLayoutMethod) {
-            $this->updateLayout = (function (...$payload) use ($methodName) {
+        if ($methodName = $updateRequestLayoutCallbackMethod) {
+            $this->updateRequestLayoutCallback = (function (...$payload) use ($methodName) {
                 return $this->{$methodName}(...$payload);
             });
         } else {
-            $this->updateLayout = function () {
+            $this->updateRequestLayoutCallback = function () {
                 return [];
             };
         }
 
-        if ($methodName = $listDeterminationMethod) {
-            $this->listDetermination = (function (...$payload) use ($methodName) {
+        if ($methodName = $listMappingCallbackMethod) {
+            $this->listMappingCallback = (function (...$payload) use ($methodName) {
                 return $this->{$methodName}(...$payload);
             });
         } else {
-            $this->listDetermination = function (array $payload) {
+            $this->listMappingCallback = function (array $payload) {
                 foreach ($payload as $elem) {
                     yield $elem;
                 }
@@ -63,23 +63,23 @@ class CallbacksSettings
         }
     }
 
-    public function getCreateLayout(): Closure
+    public function getCreateRequestLayoutCallback(): Closure
     {
-        return $this->createLayout;
+        return $this->createRequestLayoutCallback;
     }
 
-    public function getListDetermination(): Closure
+    public function getListMappingCallback(): Closure
     {
-        return $this->listDetermination;
+        return $this->listMappingCallback;
     }
 
-    public function getRelationMapper(): Closure
+    public function getRelationMappingCallback(): Closure
     {
-        return $this->relationMapper;
+        return $this->relationMappingCallback;
     }
 
-    public function getUpdateLayout(): Closure
+    public function getUpdateRequestLayoutCallback(): Closure
     {
-        return $this->updateLayout;
+        return $this->updateRequestLayoutCallback;
     }
 }

@@ -5,24 +5,24 @@ namespace Awwar\PhpHttpEntityManager\Metadata;
 class FilterSettings
 {
     public function __construct(
-        private array $filterQuery = [],
-        private array $getOneQuery = [],
-        private array $filterOneQuery = [],
+        private array $onFilterQueryMixin = [],
+        private array $onGetOneQueryMixin = [],
+        private array $onFindOneQueryMixin = [],
     ) {
     }
 
-    public function getFilterOneQuery(): array
+    public function getOnFindOneQueryMixin(): array
     {
-        return $this->filterOneQuery;
+        return $this->onFindOneQueryMixin;
     }
 
-    public function getFilterQuery(): array
+    public function getOnFilterQueryMixin(): array
     {
-        return $this->filterQuery;
+        return $this->onFilterQueryMixin;
     }
 
-    public function getGetOneQuery(): array
+    public function getOnGetOneQueryMixin(): array
     {
-        return $this->getOneQuery;
+        return $this->onGetOneQueryMixin;
     }
 }

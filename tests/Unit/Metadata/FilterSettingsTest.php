@@ -11,21 +11,21 @@ class FilterSettingsTest extends TestCase
     {
         $urlSettings = new FilterSettings();
 
-        self::assertSame([], $urlSettings->getFilterQuery());
-        self::assertSame([], $urlSettings->getGetOneQuery());
-        self::assertSame([], $urlSettings->getFilterOneQuery());
+        self::assertSame([], $urlSettings->getOnFilterQueryMixin());
+        self::assertSame([], $urlSettings->getOnGetOneQueryMixin());
+        self::assertSame([], $urlSettings->getOnFindOneQueryMixin());
     }
 
     public function testCreateWhenFilled(): void
     {
         $urlSettings = new FilterSettings(
-            filterQuery: ['filterQuery'],
-            getOneQuery: ['getOneQuery'],
-            filterOneQuery: ['filterOneQuery']
+            onFilterQueryMixin: ['onFilterQueryMixin'],
+            onGetOneQueryMixin: ['onGetOneQueryMixin'],
+            onFindOneQueryMixin: ['onFindOneQueryMixin']
         );
 
-        self::assertSame(['filterQuery'], $urlSettings->getFilterQuery());
-        self::assertSame(['getOneQuery'], $urlSettings->getGetOneQuery());
-        self::assertSame(['filterOneQuery'], $urlSettings->getFilterOneQuery());
+        self::assertSame(['onFilterQueryMixin'], $urlSettings->getOnFilterQueryMixin());
+        self::assertSame(['onGetOneQueryMixin'], $urlSettings->getOnGetOneQueryMixin());
+        self::assertSame(['onFindOneQueryMixin'], $urlSettings->getOnFindOneQueryMixin());
     }
 }
