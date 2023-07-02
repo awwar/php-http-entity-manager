@@ -3,8 +3,8 @@
 namespace Awwar\PhpHttpEntityManager\Tests\Stubs;
 
 use Awwar\PhpHttpEntityManager\Collection\CollectionInterface;
-use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\FullData;
-use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\Reference;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\RelationData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\RelationReference;
 
 class DealEntityStub
 {
@@ -18,16 +18,16 @@ class DealEntityStub
     {
         if ($name === 'invoices') {
             foreach ($data['data'][$name] ?? [] as $id) {
-                yield new Reference($id);
+                yield new RelationReference($id);
             }
         }
 
         if ($name === 'user') {
-            yield new Reference($data['data'][$name]['id']);
+            yield new RelationReference($data['data'][$name]['id']);
         }
 
         if ($name === 'admin' && isset($data['data'][$name]['id'])) {
-            yield new FullData(['data' => $data['data'][$name]]);
+            yield new RelationData(['data' => $data['data'][$name]]);
         }
     }
 }

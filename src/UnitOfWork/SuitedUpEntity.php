@@ -58,8 +58,8 @@ class SuitedUpEntity
         $changesDTO = new EntityChangesDTO(
             entityChanges: [],
             relationChanges: [],
-            entityData: $this->getScalarSnapshot(),
-            relationData: $this->getRelationValues()
+            entitySnapshot: $this->getScalarSnapshot(),
+            relationsSnapshot: $this->getRelationValues()
         );
 
         $layout = $this->entityMetadata->getCreateRequestLayoutCallback($this->original)($changesDTO);
@@ -89,8 +89,8 @@ class SuitedUpEntity
         $changesDTO = new EntityChangesDTO(
             entityChanges: $entityChanges,
             relationChanges: $relationChanges,
-            entityData: $this->getScalarSnapshot(),
-            relationData: $this->getRelationValues()
+            entitySnapshot: $this->getScalarSnapshot(),
+            relationsSnapshot: $this->getRelationValues()
         );
 
         $layout = $this->entityMetadata->getUpdateRequestLayoutCallback($this->original)($changesDTO);

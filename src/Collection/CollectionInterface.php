@@ -26,4 +26,6 @@ interface CollectionInterface extends Countable, IteratorAggregate, ArrayAccess
     public function isEmpty(): bool;
 
     public function countOf(Closure $callback): int;
+
+    public function contains(mixed $item): bool;
 }

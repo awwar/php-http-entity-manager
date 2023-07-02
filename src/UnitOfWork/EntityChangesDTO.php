@@ -7,8 +7,8 @@ class EntityChangesDTO
     public function __construct(
         private array $entityChanges,
         private array $relationChanges,
-        private array $entityData,
-        private array $relationData
+        private array $entitySnapshot,
+        private array $relationsSnapshot
     ) {
     }
 
@@ -22,13 +22,13 @@ class EntityChangesDTO
         return $this->relationChanges;
     }
 
-    public function getEntityData(): array
+    public function getEntitySnapshot(): array
     {
-        return $this->entityData;
+        return $this->entitySnapshot;
     }
 
-    public function getRelationData(): array
+    public function getRelationsSnapshot(): array
     {
-        return $this->relationData;
+        return $this->relationsSnapshot;
     }
 }

@@ -3,9 +3,9 @@
 namespace Awwar\PhpHttpEntityManager\EntityManager;
 
 use Awwar\PhpHttpEntityManager\EntityManager\ListUnit\Item;
-use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\FullData;
-use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\NoData;
-use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\Reference;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\RelationData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\RelationNoData;
+use Awwar\PhpHttpEntityManager\EntityManager\RelationUnit\RelationReference;
 use Awwar\PhpHttpEntityManager\Exception\NotFoundException;
 use Awwar\PhpHttpEntityManager\Repository\HttpRepository;
 use Awwar\PhpHttpEntityManager\Repository\HttpRepositoryInterface;
@@ -40,7 +40,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
     {
         #             createEntityWithData
         #              /                \
-        #          FullData         Reference
+        #        RelationData      RelationReference
         #             |                  |
         #      exist in IDMap?     exist in IDMap?
         #         /        |           |       \
@@ -56,13 +56,13 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
         # fill and    |
         # return     |
         #        just return
-        if ($data instanceof NoData) {
+        if ($data instanceof RelationNoData) {
             return null;
         }
 
         $suit = $this->entityAtelier->suitUpClass($className);
 
-        if ($data instanceof FullData) {
+        if ($data instanceof RelationData) {
             $suit->setIdAfterRead($data->getData());
 
             if ($this->unitOfWork->hasSuit($suit)) {
@@ -76,7 +76,7 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
                 $suit->callAfterRead($data->getData(), $this);
                 $this->unitOfWork->commit($suit, false);
             }
-        } elseif ($data instanceof Reference) {
+        } elseif ($data instanceof RelationReference) {
             $suit->setId($data->getId());
 
             if (false === $this->unitOfWork->hasSuit($suit)) {
@@ -200,11 +200,6 @@ class HttpEntityManager implements HttpEntityManagerInterface, EntityCreatorInte
 
             $iterator->next();
         } while (true);
-    }
-
-    public function merge(object $object): void
-    {
-        throw new RuntimeException('Merge is not implemented!');
     }
 
     public function persist(object $object): void

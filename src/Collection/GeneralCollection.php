@@ -121,4 +121,9 @@ class GeneralCollection implements CollectionInterface
 
         return $count;
     }
+
+    public function contains(mixed $item): bool
+    {
+        return in_array($item, $this->collection);
+    }
 }

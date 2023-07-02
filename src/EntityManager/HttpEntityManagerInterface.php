@@ -26,8 +26,6 @@ interface HttpEntityManagerInterface
         bool $isFilterOne = false
     ): Generator;
 
-    public function merge(object $object): void;
-
     public function persist(object $object): void;
 
     public function refresh(object $object): void;

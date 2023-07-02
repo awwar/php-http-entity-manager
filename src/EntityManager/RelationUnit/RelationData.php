@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\EntityManager\RelationUnit;
 
-class FullData
+class RelationData
 {
     public function __construct(private array $data)
     {

@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\EntityManager\RelationUnit;
 
-class Reference
+class RelationReference
 {
     public function __construct(private string $id)
     {

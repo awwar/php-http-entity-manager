@@ -2,7 +2,7 @@
 
 namespace Awwar\PhpHttpEntityManager\EntityManager\RelationUnit;
 
-class NoData
+class RelationNoData
 {
     public function __construct()
     {
