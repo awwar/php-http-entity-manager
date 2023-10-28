@@ -7,28 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.0.1] - 2022-09-08
-
-### Fixed
-
-* Bug with deletion
-* Bug when Http EntityManager deletes entity on deletion
+## [1.0.0] - 2023-06-28
 
 ### Added
 
-* Add DefaultValue annotation
-
-#### Changed
-
-* Extends FieldMap setting
-* HttpEntityManager: find method can use criteria for requests
-
-### Doc
-
-* Init documentation
-
-## [1.0.0] - 2022-09-06
-
-### Added
-
-* Initial release
+- Initial release

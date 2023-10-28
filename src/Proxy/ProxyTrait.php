@@ -18,8 +18,16 @@ trait ProxyTrait
 
     private Closure $__setter;
 
-    public function __get(string $name)
+    public function __clone()
     {
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ($name === '__initialized') {
+            return $this->__initialized;
+        }
+
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
             $this->__initialized = true;
             call_user_func($this->__manager, $this);
@@ -28,7 +36,7 @@ trait ProxyTrait
         return $this->__getter->call($this, $this, $name);
     }
 
-    public function __set(string $name, $value): void
+    public function __set(string $name, mixed $value): void
     {
         if (($name !== $this->__id /*|| $this->__late_proxy*/) && $this->__initialized === false) {
             $this->__initialized = true;
@@ -38,20 +46,16 @@ trait ProxyTrait
         $this->__setter->call($this, $this, $name, $value);
     }
 
-    public function __clone()
-    {
-    }
-
     private function __prepare(string $idProperty, array $properties, Closure $manager, bool $lateProxy = false): void
     {
         $parentClass = get_parent_class($this);
 
-        $unsetter = Closure::bind(function (object $parent, string $name) {
+        $unsetCallback = Closure::bind(function (object $parent, string $name) {
             unset($parent->$name);
         }, null, $parentClass);
 
         foreach ($properties as $property) {
-            $unsetter($this, $property);
+            $unsetCallback($this, $property);
         }
 
         $this->__id = $idProperty;

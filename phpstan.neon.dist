@@ -6,3 +6,5 @@ parameters:
         - src
     featureToggles:
         disableCheckMissingIterableValueType: false
+    ignoreErrors:
+        - '#class-string#'
